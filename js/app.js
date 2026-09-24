@@ -639,7 +639,7 @@
     return `<svg class="iv-svg" viewBox="0 0 ${w} ${h}" width="${w * CARTE.R}" height="${h * CARTE.R}" aria-hidden="true"><defs><pattern id="iv-h" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="#F4F2ED"/><line x1="0" y1="0" x2="0" y2="5" stroke="${INK}" stroke-width=".6" opacity=".28"/></pattern></defs>
       <rect width="${w}" height="${h}" fill="#FFFFFF"/>${grille}${cotes}
       <path d="${d}" stroke="${INK}" stroke-width="1" stroke-dasharray="1 4" stroke-linecap="round" fill="none" opacity=".45"/>
-      <path class="iv-route" d="${d}" stroke="#FF8110" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+      <path class="iv-route" d="${d}" stroke="${Z.O.couleur}" stroke-width="2.6" stroke-linecap="round" fill="none"/>
       <g class="iv-bateau"><path d="M0 -7 L4.5 5 L0 3 L-4.5 5 Z" fill="${INK}" stroke="#FFFFFF" stroke-width="1.2" stroke-linejoin="round"/></g>
       <text x="${w - 10}" y="${h - 10}" text-anchor="end" font-size="9" font-weight="600" fill="${INK}" opacity=".6">Baie de Quiberon</text>
       <g transform="translate(24 ${h - 28})" fill="none" stroke="${INK}" stroke-width="1.2"><circle r="11"/><path d="M0 -8 L3 2 L0 0 L-3 2 Z" fill="${INK}"/></g><text x="24" y="${h - 43}" text-anchor="middle" font-size="9" font-weight="700" fill="${INK}">N</text></svg>`;

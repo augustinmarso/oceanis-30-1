@@ -22,7 +22,14 @@
   /* ───── Couleurs libres par catégorie ───── */
   const OFFICIEL = Object.fromEntries(ZONES.map(z => [z.id, { couleur: z.couleur, texte: z.texte, sombre: z.sombre, fondu: z.fondu }]));
   let choix;
-  try { choix = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { choix = {}; }
+  // Gammes toutes prêtes : une couleur par zone (B horizontal GV, P sécurité, O conduite, J vertical GV, V voile avant)
+  const GAMMES = [
+    { nom: 'Officielle', couleurs: null },
+    { nom: 'Gamme colorée 1', couleurs: { B: '#1E405B', P: '#504443', O: '#E9B83F', J: '#EBD15C', V: '#A0B6B3' } },
+  ];
+  // Par défaut (aucun choix enregistré) : Gamme colorée 1. « Officielle » s'enregistre comme {} et reste possible en mode dev.
+  const DEFAUT = GAMMES[1].couleurs;
+  try { choix = JSON.parse(localStorage.getItem(KEY)) ?? { ...DEFAUT }; } catch (e) { choix = { ...DEFAUT }; }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(choix)); } catch (e) { /* stockage indisponible */ } };
 
   const hex = c => [1, 3, 5].map(i => parseInt(c.substr(i, 2), 16));
@@ -52,11 +59,6 @@
   card.setAttribute('aria-label', 'Couleurs des catégories');
   col.appendChild(card);
 
-  // Gammes toutes prêtes : une couleur par zone (B horizontal GV, P sécurité, O conduite, J vertical GV, V voile avant)
-  const GAMMES = [
-    { nom: 'Officielle', couleurs: null },
-    { nom: 'Gamme colorée 1', couleurs: { B: '#1E405B', P: '#504443', O: '#E9B83F', J: '#EBD15C', V: '#A0B6B3' } },
-  ];
   const gammeActive = () => GAMMES.findIndex(g => g.couleurs
     ? ZONES.every(z => (choix[z.id] || '').toUpperCase() === g.couleurs[z.id])
     : !Object.keys(choix).length);
