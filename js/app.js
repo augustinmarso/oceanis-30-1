@@ -27,7 +27,18 @@
     return s;
   };
   let S;
-  try { S = JSON.parse(localStorage.getItem(KEY)) || demo(); } catch (e) { S = demo(); }
+  // Arrivée par le QR code (mode partage) : tout part décoché ; en mode dev, l'état de démonstration des maquettes
+  const depart = () => (PARTAGE ? fresh() : demo());
+  try { S = JSON.parse(localStorage.getItem(KEY)) || depart(); } catch (e) { S = depart(); }
+  // Visiteurs arrivés par le QR code avant ce changement : on repart une fois de zéro (leçons, sac, tâches finies)
+  try {
+    if (PARTAGE && !localStorage.getItem('oceanis301:vierge')) {
+      S = fresh();
+      ['oceanis301:sac', 'oceanis301:taches-finies'].forEach(k => localStorage.removeItem(k));
+      localStorage.setItem('oceanis301:vierge', '1');
+      localStorage.setItem(KEY, JSON.stringify(S));
+    }
+  } catch (e) { /* stockage indisponible */ }
   S = Object.assign(fresh(), S);
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* stockage indisponible */ } };
 
