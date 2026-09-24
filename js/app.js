@@ -572,8 +572,9 @@
         <p class="pd-marque">${esc(x.marque)}</p>
         <h1>${esc(x.nom)}</h1>
         <p class="pd-desc">${esc(x.description)}</p>
-        <p class="pd-sous">Dans la mallette</p>
-        <ul class="pd-contenu">${x.contenu.map(c => `<li>${I.check(INK, 13, 2.5)}${esc(c)}</li>`).join('')}</ul>
+        <p class="pd-sous">Les 5 F de la navigation</p>
+        <ol class="pd-5f">${x.cinqF.map((c, i) => { const z = ZONES[i]; return `<li><span class="pd-f" style="background:${z.couleur};color:${z.sombre ? '#FFFFFF' : INK}">F</span>
+          <span><b>${esc(c.f)}</b><em>${esc(c.texte)}</em><span class="pd-objets">${c.objets.map(o => `<i>${esc(o)}</i>`).join('')}</span></span></li>`; }).join('')}</ol>
         <p class="pd-sous">Taille <span>Sans taille</span></p>
         <div class="pd-qte"><button data-qte="-1" aria-label="Moins">−</button><span>${quantite}</span><button data-qte="1" aria-label="Plus">+</button></div>
         <p class="pd-prix"><b>${esc(x.prix)}</b><small>Prix indicatif · concept Beneteau × Decathlon</small></p>

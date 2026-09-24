@@ -612,9 +612,16 @@ const SAC = [
   // Kit à se fournir : photo locale (src), carte pleine largeur (large), contenu détaillé
   // page produit dédiée (#/produit/mallette), façon fiche Decathlon ; prix indicatif : concept du projet
   { id: 'mallette', nom: 'La mallette des 5 F de la navigation', src: 'img/voyage/mallette-5f.jpg', page: true,
-    marque: 'QUECHUA', prix: '34,99 €', note: 'Le kit complet, rangé dans une trousse',
-    description: 'Une trousse qui s’ouvre à plat : tout ce qu’il faut pour une journée en mer tient dedans, chaque chose à sa place. Elle se glisse dans le sac étanche et se retrouve en un geste.',
-    contenu: ['Couvertures de survie', 'Multi-outil', 'Compas et crayon', 'Comprimés et collyre', 'Tour de cou polaire', 'Barres de céréales', 'Gourde 500 ml', 'Lampe frontale', 'Mousqueton'],
+    marque: 'QUECHUA', prix: '34,99 €', note: 'Faim · Soif · Froid · Frousse · Fatigue',
+    description: 'Faim, soif, froid, frousse, fatigue : les 5 F sont ce qui gâche une journée en mer. Cette trousse qui s’ouvre à plat range une réponse à chacun, chaque chose à sa place. Elle se glisse dans le sac étanche et se retrouve en un geste.',
+    // Les 5 F de la navigation : ce qui gâche une sortie en mer, et ce que la mallette contient contre chacun
+    cinqF: [
+      { f: 'Faim', texte: 'On mange avant d’avoir faim : en mer, le corps brûle plus.', objets: ['Barres de céréales'] },
+      { f: 'Soif', texte: 'Le vent et le sel dessèchent : on boit régulièrement.', objets: ['Gourde 500 ml'] },
+      { f: 'Froid', texte: 'On se couvre avant d’avoir froid, surtout le soir.', objets: ['Tour de cou polaire', 'Couvertures de survie'] },
+      { f: 'Frousse', texte: 'On se sent en sécurité quand on sait se repérer et s’attacher.', objets: ['Lampe frontale', 'Compas et crayon', 'Mousqueton', 'Multi-outil'] },
+      { f: 'Fatigue', texte: 'On se relaie et on soigne les petits bobos tout de suite.', objets: ['Comprimés', 'Collyre'] },
+    ],
     lien: '/search?Ntt=trousse%20de%20rangement%20quechua' },
   { id: 'sac', nom: 'Sac étanche souple', note: 'Duffle 60 L : il se range sous la couchette', img: 'p2831005/k$7a6bac21233e1fcfa4f0e98eaab26cfc', lien: '/p/sac-etanche-duffle-bag-sac-de-voyage-60l-jaune-noir/333985/c290c381m8773849', louer: true },
   { id: 'veste', nom: 'Veste imperméable', note: 'Contre les embruns et le vent', img: 'p2491510/k$5ece759390b53853845aca10773962b2', lien: '/p/blouson-veste-impermeable-de-voile-coupe-vent-sailing-500-homme-gris-noir/327999/c383c381m8612702', louer: true },
