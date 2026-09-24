@@ -1076,12 +1076,16 @@
     const vw = window.innerWidth, vh = window.innerHeight;
     const phone = PARTAGE || vw <= 560 || matchMedia('(pointer:coarse)').matches && vw < vh;
     let s, h;
-    if (PARTAGE && vw / vh > 0.62) { s = vh / 844; h = 844; }                 // partage sur écran large : toute la hauteur
-    else if (phone) { s = vw / 390; h = Math.max(700, vh / s); }
+    if (PARTAGE && vw / vh > 0.8) { s = vh / 844; h = 844; }                  // partage sur écran à l'horizontale : toute la hauteur
+    else if (phone) { s = vw / 390; h = Math.max(700, vh / s); }              // téléphone, tablette debout : toute la largeur
     else { s = Math.min(document.fullscreenElement ? 9 : 1, (vh - 48) / 844, (vw - 48) / 390); h = 844; }   // plein écran : agrandi à la hauteur
     document.body.classList.toggle('framed', !phone);
     document.documentElement.style.setProperty('--h', h + 'px');
-    $stage.style.transform = `translate(-50%,-50%) scale(${s})`;
+    // Partage : si l'écran est trop court pour l'app à pleine largeur, la page défile au lieu de rapetisser
+    const defile = PARTAGE && h * s > vh + 1;
+    document.body.classList.toggle('defile', defile);
+    document.body.style.height = defile ? h * s + 'px' : '';
+    $stage.style.transform = defile ? `translateX(-50%) scale(${s})` : `translate(-50%,-50%) scale(${s})`;
     fitCarte();
   }
   window.addEventListener('resize', fit);

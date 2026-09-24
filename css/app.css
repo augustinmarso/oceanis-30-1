@@ -499,3 +499,7 @@ body.mediation{cursor:default}
 .cm-boite button:hover{border-color:#262626}
 .cm-boite b{font-size:14px;font-weight:600}
 .cm-boite span{font-size:12px;color:#8a8a8a;line-height:1.4}
+/* Partage : l'app à pleine largeur ; écran trop court → la page défile */
+html:has(body.defile){overflow-y:auto}
+body.partage.defile{position:relative;overflow:visible;inset:auto}
+body.defile #stage{top:0;transform-origin:50% 0}
