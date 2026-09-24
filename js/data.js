@@ -610,8 +610,10 @@ const TACHES = [
 const DECATHLON = { site: 'https://www.decathlon.fr', images: 'https://contents.mediadecathlon.com/', location: 'https://www.decathlon.fr/circularity/rentals' };
 const SAC = [
   // Kit à se fournir : photo locale (src), carte pleine largeur (large), contenu détaillé
-  { id: 'mallette', nom: 'La mallette des 5 F de la navigation', large: true, src: 'img/voyage/mallette-5f.jpg',
-    note: 'Une trousse Quechua qui s’ouvre à plat, tout rangé à sa place',
+  // page produit dédiée (#/produit/mallette), façon fiche Decathlon ; prix indicatif : concept du projet
+  { id: 'mallette', nom: 'La mallette des 5 F de la navigation', src: 'img/voyage/mallette-5f.jpg', page: true,
+    marque: 'QUECHUA', prix: '34,99 €', note: 'Le kit complet, rangé dans une trousse',
+    description: 'Une trousse qui s’ouvre à plat : tout ce qu’il faut pour une journée en mer tient dedans, chaque chose à sa place. Elle se glisse dans le sac étanche et se retrouve en un geste.',
     contenu: ['Couvertures de survie', 'Multi-outil', 'Compas et crayon', 'Comprimés et collyre', 'Tour de cou polaire', 'Barres de céréales', 'Gourde 500 ml', 'Lampe frontale', 'Mousqueton'],
     lien: '/search?Ntt=trousse%20de%20rangement%20quechua' },
   { id: 'sac', nom: 'Sac étanche souple', note: 'Duffle 60 L : il se range sous la couchette', img: 'p2831005/k$7a6bac21233e1fcfa4f0e98eaab26cfc', lien: '/p/sac-etanche-duffle-bag-sac-de-voyage-60l-jaune-noir/333985/c290c381m8773849', louer: true },
@@ -623,7 +625,7 @@ const SAC = [
   { id: 'gants', nom: 'Gants de voile', note: 'Pour les écoutes et le winch', img: 'p2811424/k$9426a28bbe1a3b74a030f9fbb25d9cc5', lien: '/p/gants-de-voile-adulte-2-doigts-coupes-sailing-900-noir/333892/c382c180m8647380' },
   { id: 'lunettes', nom: 'Lunettes polarisées', note: 'La mer réfléchit le soleil', img: 'p3051976/k$3896e8bb91a60b7ce507f0bb01f3033c', lien: '/p/lunettes-de-soleil-sport-polarisees-categorie-3-explore-500-wrp/365352/c210m8942059' },
   { id: 'chapeau', nom: 'Chapeau bateau', note: 'Avec son cordon, contre le vent', img: 'p3105156/k$89c0f51ce37a3c3985a8d1d741dbc141', lien: '/p/chapeau-bateau-adulte-500-france-bleu-marine/333965/c195m8971970' },
-  { id: 'creme', nom: 'Crème solaire 50+', note: 'À remettre toutes les 2 heures', img: 'p2679961/k$960cb9288718c9cb4a8d2587f0334b72', lien: '/p/creme-solaire-sport-spf50-50ml/347102/m8803561' },
+  { id: 'creme', nom: 'Crème solaire SPF 50', note: 'Tube 200 ml, à remettre toutes les 2 heures', img: 'p3139843/k$4edf99eef9119ab7017ce448d123388d', lien: '/p/creme-solaire-spf50-200ml/347098/m8803560' },
   { id: 'frontale', nom: 'Lampe frontale', note: 'Pour la nuit, sans éblouir les autres', img: 'p2572886/k$ecd1bf4d819100bc04f8a9438fee4c41', lien: '/p/lampe-frontale-rechargeable-120-lumens-hl100-usb/302568/c195c443m8505682', louer: true },
   { id: 'serviette', nom: 'Serviette microfibre', note: 'Compacte, sèche en une heure', img: 'p2865244/k$c988e439487b8516cb8faffbff14d235', lien: '/p/serviette-microfibre-ultra-compacte-taille-xl-110-x-175-cm-noir/158653/c382c108m8926381' },
   { id: 'duvet', nom: 'Sac de couchage', note: 'Léger, 20 °C suffit en juin', img: 'p3088710/k$2ed3af0e9d3eedf4fbccee19f005b481', lien: '/p/sac-de-couchage-de-camping-20degc-basic/381859/c386c149c288m9003378', louer: true },

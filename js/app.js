@@ -543,10 +543,10 @@
   V.sac = () => {
     const ok = lire(SACK, {}), n = SAC.filter(x => ok[x.id]).length;
     const vie = VIE_A_BORD.map(v => `<li>${imgD(imgDeca(v.img, 160))}<span><b>${esc(v.titre)}</b>${esc(v.texte)}</span></li>`).join('');
-    const objets = SAC.map(x => `<div class="sac-o${ok[x.id] ? ' ok' : ''}${x.large ? ' large' : ''}">
-        <button class="sac-img" data-sac="${x.id}" aria-pressed="${!!ok[x.id]}" aria-label="${esc(x.nom)} : ${ok[x.id] ? 'je l’ai' : 'je ne l’ai pas'}"><span class="sac-rond"></span>${imgD(imgDeca(x.id))}</button>
-        <b>${esc(x.nom)}</b><small>${esc(x.note)}</small>${x.contenu ? `<ul class="sac-contenu">${x.contenu.map(c => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}
-        ${ok[x.id] ? `<span class="sac-a">${I.check(INK, 12, 3)} Dans le sac</span>` : `<span class="sac-liens"><a href="${DECATHLON.site}${x.lien}" target="_blank" rel="noopener">Acheter</a>${x.louer ? `<a href="${DECATHLON.location}" target="_blank" rel="noopener">Louer</a>` : ''}</span>`}
+    const objets = SAC.map(x => `<div class="sac-o${ok[x.id] ? ' ok' : ''}">
+        <button class="sac-img" ${x.page ? `data-go="#/produit/${x.id}"` : `data-sac="${x.id}"`} aria-pressed="${!!ok[x.id]}" aria-label="${esc(x.nom)} : ${ok[x.id] ? 'je l’ai' : 'je ne l’ai pas'}"><span class="sac-rond"></span>${imgD(imgDeca(x.id))}</button>
+        <b>${esc(x.nom)}</b><small>${esc(x.note)}</small>
+        ${ok[x.id] ? `<span class="sac-a">${I.check(INK, 12, 3)} Dans le sac</span>` : `<span class="sac-liens"><a href="${x.page ? `#/produit/${x.id}` : DECATHLON.site + x.lien}"${x.page ? '' : ' target="_blank" rel="noopener"'}>${x.page ? 'Voir' : 'Acheter'}</a>${x.louer ? `<a href="${DECATHLON.location}" target="_blank" rel="noopener">Louer</a>` : ''}</span>`}
       </div>`).join('');
     return screen(null, `background:var(--neutral);--rond:${Z.O.couleur}`, `
       <div class="head"><a class="icon-btn" href="#/" aria-label="Retour">${I.back()}</a><h1>Avant de naviguer</h1></div>
@@ -557,6 +557,31 @@
         <section><h2>À emporter</h2><div class="sac-grille">${objets}</div></section>
         <p class="sac-source">Équipements et images : Decathlon. Ce qui te manque s'achète en ligne, ou se loue pour le week-end.</p>
       </div>`);
+  };
+
+  /* Page produit, dans l'esprit d'une fiche Decathlon : visuel sur fond gris clair, marque, grand titre, description,
+     contenu, quantité, prix (indicatif : concept du projet), « Ajouter à mon sac » */
+  let quantite = 1;
+  V.produit = id => {
+    const x = SAC.find(o => o.id === id && o.page);
+    if (!x) return V.sac();
+    const ok = lire(SACK, {})[id];
+    return `<main class="panel produit" style="top:12px;background:#FFFFFF">
+      <div class="pd">
+        <div class="pd-visuel"><img src="${esc(x.src)}" alt="${esc(x.nom)}"></div>
+        <p class="pd-marque">${esc(x.marque)}</p>
+        <h1>${esc(x.nom)}</h1>
+        <p class="pd-desc">${esc(x.description)}</p>
+        <p class="pd-sous">Dans la mallette</p>
+        <ul class="pd-contenu">${x.contenu.map(c => `<li>${I.check(INK, 13, 2.5)}${esc(c)}</li>`).join('')}</ul>
+        <p class="pd-sous">Taille <span>Sans taille</span></p>
+        <div class="pd-qte"><button data-qte="-1" aria-label="Moins">−</button><span>${quantite}</span><button data-qte="1" aria-label="Plus">+</button></div>
+        <p class="pd-prix"><b>${esc(x.prix)}</b><small>Prix indicatif · concept Beneteau × Decathlon</small></p>
+        <a class="pd-deca" href="${DECATHLON.site}${x.lien}" target="_blank" rel="noopener">Voir les trousses sur decathlon.fr ›</a>
+      </div>
+      ${backBtn('#/sac')}
+      <button class="cta dark pd-ajout" data-sac="${id}" data-retour="#/sac">${ok ? 'Dans ton sac · retirer' : 'Ajouter à mon sac'}</button>
+    </main>`;
   };
 
   // Fiche d'une tâche : explication, à qui elle est confiée, « Marquer comme finie »
@@ -934,6 +959,7 @@
       case 'inviter': html = V.inviter(); break;
       case 'tache': html = V.tache(a); break;
       case 'sac': html = V.sac(); break;
+      case 'produit': html = V.produit(a); break;
       case 'rejoindre': html = V.rejoindre(); break;
       default: html = V.home();
     }
@@ -1080,11 +1106,14 @@
     if (e.target.closest('[data-embarquer]')) { try { localStorage.setItem(INVITE_VUE, '1'); } catch (x) { /* stockage indisponible */ } }
     if (e.target.closest('[data-rejouer]')) return jouerCarte();
     if (e.target.closest('[data-repartir]')) { ecrire(KANBAN, repartir()); return route(); }
+    const qte = e.target.closest('[data-qte]');
+    if (qte) { quantite = Math.max(1, Math.min(9, quantite + +qte.dataset.qte)); qte.parentNode.querySelector('span').textContent = quantite; return; }
     const sac = e.target.closest('[data-sac]');
     if (sac) {
       const ok = lire(SACK, {}), id = sac.dataset.sac, sc = ($stage.querySelector('.sac') || {}).scrollTop || 0;
       if (ok[id]) delete ok[id]; else ok[id] = true;
       ecrire(SACK, ok);
+      if (sac.dataset.retour) return go(sac.dataset.retour);
       const t = window.OCEANIS.transition; window.OCEANIS.transition = p => p();   // sur place, sans fondu d'écran
       route(); window.OCEANIS.transition = t;
       const box = $stage.querySelector('.sac'); if (box) box.scrollTop = sc;
