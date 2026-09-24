@@ -463,7 +463,7 @@
   /* Tableau des tâches (kanban) : une colonne « À prendre » puis une colonne par équipier.
      On glisse une carte d'une colonne à l'autre ; « Répartir » place les postes selon les leçons débloquées.
      Répartition gardée dans ce navigateur. */
-  const KANBAN = 'oceanis301:taches';
+  const KANBAN = 'oceanis301:taches-nav';   // tâches de navigation uniquement (nouvelle liste)
   const PRENOM = 'oceanis301:prenom';
   const lire = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } };
   const ecrire = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* stockage indisponible */ } };
@@ -471,16 +471,42 @@
   const FINIES = 'oceanis301:taches-finies';
   const finies = () => lire(FINIES, {});
   function repartir() {
-    const { poste } = organiser(), r = {};
-    TACHES.forEach(t => { r[t.id] = t.zone ? poste[t.zone].id : null; });
+    const { gens, poste } = organiser(), r = {}, charge = {};
+    gens.forEach(g => { charge[g.id] = 0; });
+    TACHES.filter(t => t.poste).forEach(t => { r[t.id] = poste[t.zone].id; charge[r[t.id]]++; });
+    TACHES.filter(t => !t.poste).forEach(t => {
+      const z = Z[t.zone];
+      // note = compétence dans la zone (leçons débloquées) moins la charge déjà prise ; il faut au moins 1/4 des leçons.
+      // Le skipper sait tout faire mais passe après l'équipage : il prend ce qui surchargerait un équipier.
+      const note = g => g.skipper ? 0.5 - 0.3 * charge[g.id] : partZone(g.f, z) < 0.25 ? -9 : partZone(g.f, z) - 0.3 * charge[g.id];
+      const qui = [...gens].sort((a, b) => note(b) - note(a))[0];
+      r[t.id] = qui.id;
+      charge[qui.id]++;
+    });
     return r;
+  }
+  function kanbanFluide(maj, depuis) {
+    const kb = $stage.querySelector('#kanban'), sc = kb ? kb.scrollTop : 0, avant = new Map();
+    $stage.querySelectorAll('.kb-t').forEach(e => avant.set(e.dataset.t, e.getBoundingClientRect()));
+    if (depuis) avant.set(depuis.id, depuis.rect);
+    maj();
+    const t = window.OCEANIS.transition; window.OCEANIS.transition = p => p(); route(); window.OCEANIS.transition = t;
+    const nkb = $stage.querySelector('#kanban'); if (nkb) nkb.scrollTop = sc;
+    const k = $stage.getBoundingClientRect().width / $stage.offsetWidth;
+    $stage.querySelectorAll('.kb-t').forEach(e => {
+      const a = avant.get(e.dataset.t); if (!a) return;
+      const b = e.getBoundingClientRect(), dx = (a.left - b.left) / k, dy = (a.top - b.top) / k;
+      if (Math.abs(dx) + Math.abs(dy) < 1) return;
+      e.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 460, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    });
   }
   const taches = () => { const r = lire(KANBAN, null); return r && TACHES.every(t => t.id in r) ? r : repartir(); };
   V.equipage = () => {
     const { gens } = organiser(), r = taches(), f = finies();
     const dossiers = [{ id: '', nom: 'À prendre', sous: 'Tâches libres', couleur: '#FFFFFF', fg: INK }, ...gens.map(g => {
-      const z = g.zone && Z[g.zone];
-      return { id: g.id, nom: g.nom, sous: g.niveau + (z ? ' · ' + POSTES[z.id].nom : ''), couleur: '#FFFFFF', fg: INK, g };
+      // poste affiché = celui qu'il a vraiment dans le tableau (il suit les déplacements de cartes)
+      const postes = TACHES.filter(t => t.poste && !f[t.id] && r[t.id] === g.id).map(t => POSTES[t.zone].nom);
+      return { id: g.id, nom: g.nom, sous: g.niveau + (postes.length ? ' · ' + postes.join(', ') : ''), couleur: '#FFFFFF', fg: INK, g };
     }), { id: 'fini', fini: true, nom: 'Fini', sous: 'Tâches terminées', couleur: '#D9D6CF', fg: INK }];
     let haut = 0;
     const html = dossiers.map((d, i) => {
@@ -515,41 +541,64 @@
      (remplissage par diffusion, tolérance sur l'écart à la couleur du fond, bord adouci). Résultat gardé en mémoire. */
   const decoupes = new Map();
   const imgD = (u, alt = '') => `<img src="${decoupes.get(u) || u}" data-detour="${u}"${decoupes.has(u) ? ' class="detoure"' : ''} alt="${alt}" crossorigin="anonymous">`;
-  function detourer(u) {
-    if (decoupes.has(u) || detourer[u]) return;
-    detourer[u] = 1;
-    const im = new Image();
-    im.crossOrigin = 'anonymous';
-    im.onload = () => {
-      const W = im.naturalWidth, H = im.naturalHeight, c = document.createElement('canvas');
-      c.width = W; c.height = H;
-      const g = c.getContext('2d', { willReadFrequently: true });
-      g.drawImage(im, 0, 0);
-      const d = g.getImageData(0, 0, W, H), px = d.data;
-      // Fond = zone claire et peu colorée reliée aux bords ; on avance de proche en proche tant que la teinte varie
-      // doucement (suit les dégradés et les fonds en deux tons), puis on adoucit d'un pixel le bord de la silhouette.
+  // Le calcul se fait dans un Web Worker (OffscreenCanvas) : l'écran reste fluide pendant le détourage.
+  // Navigateur sans OffscreenCanvas : même calcul sur le fil principal, une image à la fois.
+  const CODE_DETOUR = `
+    function detourer(px, W, H) {
       const clair = i => { const r = px[i * 4], v = px[i * 4 + 1], b = px[i * 4 + 2]; return (r + v + b) / 3 > 168 && Math.max(r, v, b) - Math.min(r, v, b) < 34; };
       const pas = (i, j) => Math.abs(px[i * 4] - px[j * 4]) + Math.abs(px[i * 4 + 1] - px[j * 4 + 1]) + Math.abs(px[i * 4 + 2] - px[j * 4 + 2]);
-      const fond = new Uint8Array(W * H), pile = [];
-      const bord = [];
+      const fond = new Uint8Array(W * H), pile = [], bord = [];
       for (let x = 0; x < W; x++) bord.push(x, (H - 1) * W + x);
       for (let y = 1; y < H - 1; y++) bord.push(y * W, y * W + W - 1);
       bord.forEach(i => { if (clair(i)) { fond[i] = 1; pile.push(i); } });
       const voisins = i => { const x = i % W, y = (i / W) | 0; return [x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, y > 0 ? i - W : -1, y < H - 1 ? i + W : -1]; };
-      while (pile.length) {
-        const i = pile.pop();
-        for (const j of voisins(i)) if (j >= 0 && !fond[j] && clair(j) && pas(i, j) < 18) { fond[j] = 1; pile.push(j); }
-      }
+      while (pile.length) { const i = pile.pop(); for (const j of voisins(i)) if (j >= 0 && !fond[j] && clair(j) && pas(i, j) < 18) { fond[j] = 1; pile.push(j); } }
       for (let i = 0; i < W * H; i++) {
         if (fond[i]) { px[i * 4 + 3] = 0; continue; }
-        if (voisins(i).some(j => j >= 0 && fond[j]) && clair(i)) px[i * 4 + 3] = 150;   // lisière adoucie
+        if (voisins(i).some(j => j >= 0 && fond[j]) && clair(i)) px[i * 4 + 3] = 150;
       }
+    }`;
+  let ouvrier = null;
+  const attente = new Map();
+  try {
+    if (typeof OffscreenCanvas !== 'undefined') {
+      ouvrier = new Worker(URL.createObjectURL(new Blob([CODE_DETOUR + `
+        onmessage = async e => {
+          const { u, url } = e.data;
+          try {
+            const bmp = await createImageBitmap(await (await fetch(url, { mode: 'cors' })).blob());
+            const c = new OffscreenCanvas(bmp.width, bmp.height), g = c.getContext('2d', { willReadFrequently: true });
+            g.drawImage(bmp, 0, 0);
+            const d = g.getImageData(0, 0, c.width, c.height);
+            detourer(d.data, c.width, c.height);
+            g.putImageData(d, 0, 0);
+            postMessage({ u, blob: await c.convertToBlob({ type: 'image/png' }) });
+          } catch (x) { postMessage({ u, erreur: true }); }
+        };`], { type: 'text/javascript' })));
+      ouvrier.onmessage = e => { const { u, blob } = e.data; poser(u, blob ? URL.createObjectURL(blob) : null); };
+    }
+  } catch (e) { ouvrier = null; }
+  const detourerLocal = new Function('px', 'W', 'H', CODE_DETOUR + '; detourer(px, W, H);');
+  function poser(u, url) {                                   // image détourée prête (ou échec : on montre l'originale)
+    if (url) decoupes.set(u, url);
+    $stage.querySelectorAll('img[data-detour]').forEach(x => { if (x.dataset.detour === u) { if (url) x.src = url; x.classList.add('detoure'); } });
+  }
+  function detourer(u) {
+    if (decoupes.has(u) || attente.has(u)) return;
+    attente.set(u, 1);
+    if (ouvrier) { ouvrier.postMessage({ u, url: new URL(u, location.href).href }); return; }
+    const im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.onload = () => setTimeout(() => {
+      const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight;
+      const g = c.getContext('2d', { willReadFrequently: true });
+      g.drawImage(im, 0, 0);
+      const d = g.getImageData(0, 0, c.width, c.height);
+      detourerLocal(d.data, c.width, c.height);
       g.putImageData(d, 0, 0);
-      const url = c.toDataURL('image/png');
-      decoupes.set(u, url);
-      $stage.querySelectorAll('img[data-detour]').forEach(x => { if (x.dataset.detour === u) { x.src = url; x.classList.add('detoure'); } });
-    };
-    im.onerror = () => { $stage.querySelectorAll('img[data-detour]').forEach(x => { if (x.dataset.detour === u) x.classList.add('detoure'); }); };
+      poser(u, c.toDataURL('image/png'));
+    }, 0);
+    im.onerror = () => poser(u, null);
     im.src = u;
   }
   // Jauge : un sac qui grossit à mesure qu'on coche, du jaune sombre au jaune clair (celui des validations)
@@ -625,7 +674,7 @@
     const t = TACHES.find(x => x.id === id);
     if (!t) return V.equipage();
     const { gens } = organiser(), qui = gens.find(g => g.id === taches()[id]), fait = !!finies()[id], z = t.zone && Z[t.zone];
-    const texte = z ? `${POSTES[z.id].role}. ${z.intro}` : t.texte;
+    const texte = t.poste ? `${POSTES[z.id].role}. ${z.intro}` : t.texte;
     const lien = z ? `<a class="tache-lien" href="#/zone/${z.id}" style="color:${z.texte}">Les gestes du poste · ${z.actions.filter(a => qui && qui.f[a]).length}/${z.actions.length} ›</a>` : '';
     return screen(z ? z.id : null, `background:${z ? z.couleur : 'var(--neutral)'}`, `
       ${backBtn('#/equipage')}
@@ -672,14 +721,9 @@
     const g = glisse; glisse = null;
     if (!g.parti) return;
     glisseFin = performance.now();
+    const r0 = g.fantome.getBoundingClientRect();
     g.fantome.remove(); g.t.classList.remove('kb-parti');
-    if (g.cible) {
-      const r = taches(), kb = $stage.querySelector('#kanban'), sl = kb.scrollTop;
-      r[g.t.dataset.t] = g.cible.dataset.col || null;
-      ecrire(KANBAN, r);
-      route();
-      const nkb = $stage.querySelector('#kanban'); if (nkb) nkb.scrollTop = sl;
-    }
+    if (g.cible) kanbanFluide(() => { const r = taches(); r[g.t.dataset.t] = g.cible.dataset.col || null; ecrire(KANBAN, r); }, { id: g.t.dataset.t, rect: r0 });
   };
   $stage.addEventListener('pointerup', lacher);
   $stage.addEventListener('pointercancel', lacher);
@@ -1011,7 +1055,7 @@
       $stage.querySelectorAll('img[data-detour]:not(.detoure)').forEach(i => detourer(i.dataset.detour));
       if (name === 'invitation') jouerCarte();
       if (deblocage && name === '') jouerDeblocage(deblocage);
-      if (window.OCEANIS3D) window.OCEANIS3D.attach();
+      if (window.OCEANIS3D && !document.body.classList.contains('mediation')) window.OCEANIS3D.attach();   // écran QR : pas de 3D à charger
     };
     // Le studio d'animation (js/studio.js) peut habiller le changement d'écran (View Transitions),
     // sauf entre deux états du Parcours : là, ce sont les dossiers eux-mêmes qui bougent
@@ -1140,7 +1184,7 @@
     startNfc();
     if (e.target.closest('[data-embarquer]')) { try { localStorage.setItem(INVITE_VUE, '1'); } catch (x) { /* stockage indisponible */ } }
     if (e.target.closest('[data-rejouer]')) return jouerCarte();
-    if (e.target.closest('[data-repartir]')) { ecrire(KANBAN, repartir()); return route(); }
+    if (e.target.closest('[data-repartir]')) return kanbanFluide(() => ecrire(KANBAN, repartir()));
     const qte = e.target.closest('[data-qte]');
     if (qte) { quantite = Math.max(1, Math.min(9, quantite + +qte.dataset.qte)); qte.parentNode.querySelector('span').textContent = quantite; return; }
     const sac = e.target.closest('[data-sac]');
@@ -1162,8 +1206,8 @@
     if (fin) {
       const f = finies(), id = fin.dataset.finir;
       if (f[id]) delete f[id]; else f[id] = Date.now();
-      ecrire(FINIES, f);
-      return fin.dataset.retour ? go('#/equipage') : route();
+      if (fin.dataset.retour) { ecrire(FINIES, f); return go('#/equipage'); }
+      return kanbanFluide(() => ecrire(FINIES, f));
     }
     const carteT = e.target.closest('.kb-t');
     if (carteT && performance.now() - glisseFin > 250) return go('#/tache/' + carteT.dataset.t);

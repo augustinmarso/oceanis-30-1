@@ -113,10 +113,10 @@ const PIECES = {
   },
   'barre': {
     zone: 'O', nom: 'Barre', titre: 'la Barre', action: 'diriger',
-    def: "La barre franche est le long bras relié au safran, sous l'arrière du bateau.",
-    sert: "Elle dirige le bateau. On pousse la barre d'un côté : le bateau tourne de l'autre.",
+    def: "L'Oceanis 30.1 a deux barres à roue, une de chaque côté du cockpit, reliées au safran sous l'arrière du bateau.",
+    sert: "Elles dirigent le bateau. On tourne la roue comme un volant : du côté où l'on veut aller.",
     skipper: '« Prends la barre ! »',
-    comment: [{ t: 'Tiens-la à une main, assis au vent', sous: ['Petits mouvements, puis attends la réaction'] }],
+    comment: [{ t: 'Place-toi à la roue côté au vent, les deux mains dessus', sous: ['Petits mouvements, puis attends la réaction'] }],
   },
   'compas': {
     zone: 'O', nom: 'Compas et instruments', titre: 'les Instruments', action: 'diriger',
@@ -301,15 +301,15 @@ const ACTIONS = {
   'diriger': {
     zone: 'O', titre: 'Diriger le bateau', court: 'Diriger', duree: 3, type: 'geste', pieces: ['barre', 'compas'],
     etapes: [
-      { t: 'Assieds-toi côté au vent, la barre en main', tip: 'Tu vois mieux les voiles et devant toi.' },
+      { t: 'Prends la roue côté au vent', tip: 'Tu vois mieux les voiles et devant toi.' },
       { t: 'Choisis un repère devant le bateau', tip: 'Un phare, une maison, un nuage bas.' },
-      { t: 'Pousse la barre pour tourner de l\'autre côté', tip: 'Barre à gauche : le bateau part à droite.' },
+      { t: 'Tourne la roue du côté où tu veux aller', tip: 'Roue vers la droite : le bateau part à droite.' },
       { t: 'Petits mouvements, puis attends', tip: 'Le bateau réagit avec un temps de retard.' },
     ],
     quiz: {
-      contexte: "Tu tiens la barre franche.", parole: "« Viens un peu à droite ! »", question: "Tu pousses la barre…",
-      options: ["Vers la gauche", "Vers la droite", "Nulle part : tu la lâches"],
-      bonne: 0, explication: "Avec une barre franche, on pousse du côté opposé à celui où l'on veut aller.",
+      contexte: "Tu es à la barre à roue.", parole: "« Viens un peu à droite ! »", question: "Tu tournes la roue…",
+      options: ["Vers la droite", "Vers la gauche", "Nulle part : tu la lâches"],
+      bonne: 0, explication: "Une barre à roue se tourne comme un volant : du côté où l'on veut aller, par petits coups.",
     },
   },
   'observer-360': {
@@ -591,22 +591,22 @@ const COTES = [
   [[-2.892, 47.346], [-2.872, 47.345], [-2.858, 47.335], [-2.87, 47.33], [-2.888, 47.336]],
 ];
 
-/* Tâches à se répartir (tableau kanban d'Organisation à bord). Les postes (zone) suivent les leçons débloquées. */
+/* Tâches à se répartir (tableau d'« S'organiser sur le bateau ») : uniquement la navigation.
+   Chaque tâche relève d'une zone : elle revient à l'équipier le plus avancé dans les leçons de cette zone.
+   poste : l'un des 5 postes à bord (un par zone) ; les autres tâches s'ajoutent en équilibrant la charge. */
 const TACHES = [
-  { id: 'barre', titre: 'Barrer', zone: 'O' },
-  { id: 'gv', titre: 'Régler la grand-voile', zone: 'B' },
-  { id: 'mat', titre: 'Pied de mât : hisser, ris', zone: 'J' },
-  { id: 'foc', titre: 'Foc et winchs', zone: 'V' },
-  { id: 'secu', titre: 'Veille et sécurité', zone: 'P' },
-  { id: 'courses', titre: 'Courses et avitaillement', note: 'Avant le départ', texte: "Les courses pour 3 jours à 5 : petits-déjeuners, 2 déjeuners au mouillage, le dîner de vendredi. Compte 2 L d'eau par personne et par jour. À bord, le frais va dans la glacière, le reste dans les coffres du carré." },
-  { id: 'covoit', titre: 'Covoiturage', note: 'Vendredi matin', texte: "Organise les voitures jusqu'à La Trinité-sur-Mer : départ vendredi vers 7 h, rendez-vous au ponton visiteurs à 9 h. Parking longue durée près de la capitainerie." },
-  { id: 'cuisine', titre: 'Dîner de samedi', note: 'Au mouillage', texte: "Le dîner de samedi au mouillage de Houat : un plat simple, dans une seule casserole, sur le réchaud à gaz du bord. Ferme le gaz à la bouteille après usage." },
-  { id: 'meteo', titre: 'Météo marine et marées', note: 'Vendredi matin', texte: "Consulte la météo marine et l'horaire des marées le matin du départ : force et direction du vent, état de la mer, heure de pleine mer à La Trinité. Partage-les à l'équipage avant de larguer." },
-  { id: 'eau', titre: 'Plein d’eau et de gasoil', note: 'Au ponton, avant de partir', texte: "Remplis le réservoir d'eau douce au ponton et vérifie la jauge de gasoil. Le moteur sert à sortir et rentrer au port : on ne part jamais le réservoir à moitié vide." },
-  { id: 'pharmacie', titre: 'Pharmacie de bord', note: 'Avant le départ', texte: "Vérifie la trousse de secours du bateau : pansements, désinfectant, crème solaire, comprimés contre le mal de mer, antidouleurs. Complète ce qui manque et range-la au même endroit que d'habitude." },
-  { id: 'vaisselle', titre: 'Vaisselle et rangement du carré', note: 'Après chaque repas', texte: "Après chaque repas : vaisselle à l'eau de mer puis rinçage à l'eau douce, et tout se range dans les équipets fermés. Un carré rangé, c'est un bateau qui ne fait pas de bruit quand il gîte." },
-  { id: 'quart', titre: 'Veille au mouillage', note: 'Samedi soir', texte: "Au mouillage de Houat, on se relaie pour vérifier que l'ancre tient : un coup d'œil aux repères à terre avant de dormir, et au réveil. Note tes repères sur le téléphone." },
-  { id: 'amarres', titre: 'Amarres et pare-battages', note: 'À chaque port', texte: "À l'approche du port : sors les amarres avant et arrière et accroche les pare-battages côté quai, à hauteur du ponton. Au départ, on les rentre et on les range dans le coffre." },
+  { id: 'barre', titre: 'Barrer', zone: 'O', poste: true },
+  { id: 'gv', titre: 'Régler la grand-voile', zone: 'B', poste: true },
+  { id: 'mat', titre: 'Pied de mât : hisser, ris', zone: 'J', poste: true },
+  { id: 'foc', titre: 'Foc et winchs', zone: 'V', poste: true },
+  { id: 'secu', titre: 'Veille et sécurité', zone: 'P', poste: true },
+  { id: 'meteo', titre: 'Météo marine et marées', zone: 'O', note: 'Le matin, avant de larguer', texte: "Consulte la météo marine et l'horaire des marées : force et direction du vent, état de la mer, heure de pleine mer à La Trinité. Annonce-les à l'équipage avant de larguer." },
+  { id: 'route', titre: 'Tracer la route et suivre le cap', zone: 'O', note: 'Pendant la navigation', texte: "Sur la carte et le traceur : cap entre La Trinité, la passe de la Teignouse et Belle-Île. Annonce au barreur le cap à tenir et les bouées à laisser à bâbord ou à tribord." },
+  { id: 'moteur', titre: 'Moteur : démarrer et contrôler', zone: 'O', note: 'Au départ et à l’arrivée', texte: "Avant de démarrer : jauge de gasoil, circuit d'eau de mer ouvert. Après le démarrage, vérifie que l'eau sort à l'échappement. On sort et on rentre au port au moteur." },
+  { id: 'amarres', titre: 'Amarres et pare-battages', zone: 'V', note: 'À chaque port', texte: "À l'approche du port : sors les amarres avant et arrière et accroche les pare-battages côté quai, à hauteur du ponton. Au départ, on les rentre et on les range dans le coffre." },
+  { id: 'gilets', titre: 'Gilets et longes pour tous', zone: 'P', note: 'Avant de larguer', texte: "Avant de quitter le ponton : chacun enfile son gilet, sangle réglée, et la longe est prête pour aller à l'avant. Vérifie aussi la bouée couronne sur le balcon arrière." },
+  { id: 'mouillage', titre: 'Veille au mouillage', zone: 'P', note: 'Samedi soir, à Houat', texte: "Au mouillage, on se relaie pour vérifier que l'ancre tient : un coup d'œil aux repères à terre avant de dormir, et au réveil. Note tes repères sur le téléphone." },
+  { id: 'ris', titre: 'Préparer la prise de ris', zone: 'J', note: 'Si le vent forcit', texte: "Si le vent monte au-dessus de 18 nœuds : prépare la bosse de ris et la drisse, et annonce-le au barreur. On réduit la voile avant d'en avoir besoin." },
 ];
 
 /* ───── Avant de naviguer : préparer son sac (produits Decathlon) ─────
