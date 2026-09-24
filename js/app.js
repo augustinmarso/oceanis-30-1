@@ -545,11 +545,11 @@
     const ok = lire(SACK, {}), n = SAC.filter(x => ok[x.id]).length;
     const vie = VIE_A_BORD.map(v => `<li>${imgD(imgDeca(v.img, 160))}<span><b>${esc(v.titre)}</b>${esc(v.texte)}</span></li>`).join('');
     const objets = SAC.map(x => `<div class="sac-o${ok[x.id] ? ' ok' : ''}">
-        <button class="sac-img" ${x.page ? `data-go="#/produit/${x.id}"` : `data-sac="${x.id}"`} aria-pressed="${!!ok[x.id]}" aria-label="${esc(x.nom)} : ${ok[x.id] ? 'je l’ai' : 'je ne l’ai pas'}"><span class="sac-rond"></span>${imgD(imgDeca(x.id))}<span class="sac-like">${I.like()}</span></button>
+        <button class="sac-img" ${x.page ? `data-go="#/produit/${x.id}"` : `data-sac="${x.id}"`} aria-pressed="${!!ok[x.id]}" aria-label="${esc(x.nom)} : ${ok[x.id] ? 'je l’ai' : 'je ne l’ai pas'}"><span class="sac-rond"><svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>${imgD(imgDeca(x.id))}</button>
         <b>${esc(x.nom)}</b><small>${esc(x.note)}</small>
         ${ok[x.id] ? `<span class="sac-a">${I.check(INK, 12, 3)} Dans le sac</span>` : `<span class="sac-liens"><a href="${x.page ? `#/produit/${x.id}` : DECATHLON.site + x.lien}"${x.page ? '' : ' target="_blank" rel="noopener"'}>${x.page ? 'Voir' : 'Acheter'}</a>${x.louer ? `<a href="${DECATHLON.location}" target="_blank" rel="noopener">Louer</a>` : ''}</span>`}
       </div>`).join('');
-    return screen(null, `background:var(--neutral);--rond:${Z.O.couleur}`, `
+    return screen(null, `background:var(--neutral);--rond:${Z.J.couleur}`, `
       <div class="head"><a class="icon-btn" href="#/" aria-label="Retour">${I.back()}</a><h1>S’organiser sur le bateau</h1></div>
       ${ongletsAvant('sac')}
       <div class="sac">
@@ -1120,7 +1120,6 @@
       const box = $stage.querySelector('.sac'); if (box) box.scrollTop = sc;
       const rond = ok[id] && $stage.querySelector(`[data-sac="${id}"] .sac-rond`);
       if (rond) rond.animate([{ transform: 'scale(0)' }, { transform: 'scale(1.08)', offset: 0.7 }, { transform: 'scale(1)' }], { duration: 380, easing: 'cubic-bezier(.3,1.4,.5,1)' });
-      const like = ok[id] && $stage.querySelector(`[data-sac="${id}"] .sac-like`);
       if (like) like.animate([{ transform: 'scale(0) rotate(-30deg)', opacity: 0 }, { transform: 'scale(1.25) rotate(8deg)', opacity: 1, offset: 0.7 }, { transform: 'none', opacity: 1 }], { duration: 460, delay: 140, easing: 'ease-out', fill: 'backwards' });
       return;
     }

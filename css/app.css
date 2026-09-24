@@ -403,8 +403,8 @@ body.plein .fs-sortie{display:flex}
 .rj-form{margin-top:auto;display:flex;flex-direction:column;gap:10px}
 .rj-form label{font-size:12.5px;opacity:.8}
 .rj-form input{height:54px;border-radius:14px;border:0;padding:0 18px;font:inherit;font-size:18px;color:var(--ink);background:#fff;outline:none}
-.rj-form input:focus{box-shadow:0 0 0 3px #E9B83F}
-.rj-form button{height:54px;border-radius:27px;border:0;background:#E9B83F;color:var(--ink);font:inherit;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;margin-top:6px}
+.rj-form input:focus{box-shadow:0 0 0 3px #ECD156}
+.rj-form button{height:54px;border-radius:27px;border:0;background:#ECD156;color:var(--ink);font:inherit;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;margin-top:6px}
 .rj-note{margin:14px 0 0;font-size:11.5px;opacity:.6;line-height:1.4}
 
 /* Kanban en dossiers (comme le Parcours) : un dossier par équipier, on y glisse les tâches */
@@ -549,7 +549,7 @@ img[data-detour]{transition:opacity .25s}
 .sac-o{border-radius:0 0 16px 16px}
 .sac-img{background:none;display:flex;align-items:center;justify-content:center;overflow:visible}
 .sac-img img{position:relative;z-index:1}
-.sac-rond{position:absolute;left:12%;top:12%;width:76%;height:76%;border-radius:50%;background:var(--rond,#E9B83F);transform:scale(0);transition:transform .3s}
+.sac-rond{position:absolute;left:12%;top:12%;width:76%;height:76%;border-radius:50%;background:var(--rond,#ECD156);transform:scale(0);transition:transform .3s}
 .sac-o.ok .sac-rond{transform:scale(1)}
 .sac-o.ok .sac-img img.detoure{opacity:1}
 .sac-img i{display:none}
@@ -604,5 +604,15 @@ img[data-detour]{transition:opacity .25s}
 .pd-objets i{font-style:normal;font-size:11px;padding:3px 8px;border-radius:10px;background:var(--neutral)}
 .pd>ol{margin-left:20px;margin-right:20px}
 /* Mon sac : pouce « like » blanc dans le rond jaune d'un produit coché */
-.sac-like{position:absolute;right:17%;top:15%;z-index:2;width:30px;height:30px;border-radius:50%;background:var(--rond,#E9B83F);display:flex;align-items:center;justify-content:center;transform:scale(0);transition:transform .3s}
+.sac-like{position:absolute;right:17%;top:15%;z-index:2;width:30px;height:30px;border-radius:50%;background:var(--rond,#ECD156);display:flex;align-items:center;justify-content:center;transform:scale(0);transition:transform .3s}
 .sac-o.ok .sac-like{transform:none}
+/* Mon sac : grande coche blanche dans le rond jaune, derrière le produit (remplace le pouce) */
+.sac-like{display:none}
+.sac-rond{display:flex;align-items:center;justify-content:center}
+.sac-rond svg{width:78%;height:78%}
+.sac-rond svg{width:96%;height:96%}
+.sac-img img{transition:transform .35s cubic-bezier(.3,1.4,.5,1),opacity .25s}
+.sac-o.ok .sac-img img{transform:scale(.8)}
+.sac-rond{left:4%;top:4%;width:92%;height:92%}
+.sac-o.ok .sac-img img{transform:scale(.62)}
+.sac-rond svg{width:100%;height:100%;stroke-width:2.2}
