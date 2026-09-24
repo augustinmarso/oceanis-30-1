@@ -541,11 +541,34 @@
     im.onerror = () => { $stage.querySelectorAll('img[data-detour]').forEach(x => { if (x.dataset.detour === u) x.classList.add('detoure'); }); };
     im.src = u;
   }
+  // Jauge : un sac qui grossit à mesure qu'on coche, du jaune sombre au jaune clair (celui des validations)
+  const JAUNE_SOMBRE = '#8F7B22';
+  const jaugeSac = n => {
+    const p = n / SAC.length, c = mix(JAUNE_SOMBRE, Z.J.couleur, p);
+    return `<div class="sac-jauge"><span class="sac-sac" style="--t:${(0.55 + 0.45 * p).toFixed(3)}"><svg viewBox="0 0 64 76" aria-hidden="true">
+        <path d="M25 13v-3a7 7 0 0 1 14 0v3" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
+        <path d="M10 26C3 34 3 56 10 66M54 26c7 8 7 30 0 40" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round" opacity=".7"/>
+        <rect x="8" y="12" width="48" height="60" rx="16" fill="${c}"/>
+        <path d="M8 30c8 7 40 7 48 0" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2.4" stroke-linecap="round"/>
+        <rect x="17" y="42" width="30" height="24" rx="8" fill="#FFFFFF" fill-opacity=".38"/></svg>
+        <b data-n="${n}">${n}</b></span><span class="sac-jt"><b>${n} / ${SAC.length}</b> dans le sac<small>Touche un produit quand tu l'as</small></span></div>`;
+  };
+  // Après avoir coché : le sac grossit (rebond) et le chiffre monte ou descend
+  function animerJauge(avant) {
+    const sacEl = $stage.querySelector('.sac-sac'), num = sacEl && sacEl.querySelector('b');
+    if (!sacEl) return;
+    const apres = +num.dataset.n;
+    const t = +sacEl.style.getPropertyValue('--t') || 1;
+    sacEl.animate([{ transform: `scale(${t * 1.2})` }, { transform: `scale(${t})` }], { duration: 420, easing: 'cubic-bezier(.3,1.5,.5,1)' });
+    const t0 = performance.now();
+    const tick = t => { const k = Math.min(1, (t - t0) / 350); num.textContent = Math.round(avant + (apres - avant) * k); if (k < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  }
   V.sac = () => {
     const ok = lire(SACK, {}), n = SAC.filter(x => ok[x.id]).length;
     const vie = VIE_A_BORD.map(v => `<li>${imgD(imgDeca(v.img, 160))}<span><b>${esc(v.titre)}</b>${esc(v.texte)}</span></li>`).join('');
     const objets = SAC.map(x => `<div class="sac-o${ok[x.id] ? ' ok' : ''}">
-        <button class="sac-img" ${x.page ? `data-go="#/produit/${x.id}"` : `data-sac="${x.id}"`} aria-pressed="${!!ok[x.id]}" aria-label="${esc(x.nom)} : ${ok[x.id] ? 'je l’ai' : 'je ne l’ai pas'}"><span class="sac-rond"><svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>${imgD(imgDeca(x.id))}</button>
+        <button class="sac-img" ${x.page ? `data-go="#/produit/${x.id}"` : `data-sac="${x.id}"`} aria-pressed="${!!ok[x.id]}" aria-label="${esc(x.nom)} : ${ok[x.id] ? 'je l’ai' : 'je ne l’ai pas'}"><span class="sac-rond"></span>${imgD(imgDeca(x.id))}</button>
         <b>${esc(x.nom)}</b><small>${esc(x.note)}</small>
         ${ok[x.id] ? `<span class="sac-a">${I.check(INK, 12, 3)} Dans le sac</span>` : `<span class="sac-liens"><a href="${x.page ? `#/produit/${x.id}` : DECATHLON.site + x.lien}"${x.page ? '' : ' target="_blank" rel="noopener"'}>${x.page ? 'Voir' : 'Acheter'}</a>${x.louer ? `<a href="${DECATHLON.location}" target="_blank" rel="noopener">Louer</a>` : ''}</span>`}
       </div>`).join('');
@@ -553,7 +576,7 @@
       <div class="head"><a class="icon-btn" href="#/" aria-label="Retour">${I.back()}</a><h1>S’organiser sur le bateau</h1></div>
       ${ongletsAvant('sac')}
       <div class="sac">
-        <p class="sac-compte"><b>${n}/${SAC.length}</b> dans le sac · touche une image quand tu l'as</p>
+        ${jaugeSac(n)}
         <section><h2>Vie à bord</h2><ul class="sac-vie">${vie}</ul></section>
         <section><h2>À emporter</h2><div class="sac-grille">${objets}</div></section>
         <p class="sac-source">Équipements et images : Decathlon. Ce qui te manque s'achète en ligne, ou se loue pour le week-end.</p>
@@ -1112,15 +1135,16 @@
     const sac = e.target.closest('[data-sac]');
     if (sac) {
       const ok = lire(SACK, {}), id = sac.dataset.sac, sc = ($stage.querySelector('.sac') || {}).scrollTop || 0;
+      const avant = SAC.filter(x => ok[x.id]).length;
       if (ok[id]) delete ok[id]; else ok[id] = true;
       ecrire(SACK, ok);
       if (sac.dataset.retour) return go(sac.dataset.retour);
       const t = window.OCEANIS.transition; window.OCEANIS.transition = p => p();   // sur place, sans fondu d'écran
       route(); window.OCEANIS.transition = t;
       const box = $stage.querySelector('.sac'); if (box) box.scrollTop = sc;
+      animerJauge(avant);
       const rond = ok[id] && $stage.querySelector(`[data-sac="${id}"] .sac-rond`);
       if (rond) rond.animate([{ transform: 'scale(0)' }, { transform: 'scale(1.08)', offset: 0.7 }, { transform: 'scale(1)' }], { duration: 380, easing: 'cubic-bezier(.3,1.4,.5,1)' });
-      if (like) like.animate([{ transform: 'scale(0) rotate(-30deg)', opacity: 0 }, { transform: 'scale(1.25) rotate(8deg)', opacity: 1, offset: 0.7 }, { transform: 'none', opacity: 1 }], { duration: 460, delay: 140, easing: 'ease-out', fill: 'backwards' });
       return;
     }
     const fin = e.target.closest('[data-finir]');

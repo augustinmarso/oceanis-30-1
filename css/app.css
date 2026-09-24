@@ -616,3 +616,18 @@ img[data-detour]{transition:opacity .25s}
 .sac-rond{left:4%;top:4%;width:92%;height:92%}
 .sac-o.ok .sac-img img{transform:scale(.62)}
 .sac-rond svg{width:100%;height:100%;stroke-width:2.2}
+/* Mon sac : le produit garde sa taille une fois coché */
+.sac-o.ok .sac-img img{transform:none}
+/* Jauge du sac : grossit et s'éclaircit à mesure qu'on coche */
+.sac-jauge{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:14px;margin:0 -16px;padding:6px 20px 10px;background:var(--neutral)}
+.sac-sac{position:relative;width:92px;height:70px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transform:scale(var(--t));transform-origin:50% 80%;transition:transform .45s cubic-bezier(.3,1.5,.5,1)}
+.sac-sac svg{position:absolute;inset:0;width:100%;height:100%}
+.sac-sac>b{position:relative;margin-top:14px;font-size:22px;font-weight:700;color:#FFFFFF}
+.sac-jt{display:flex;flex-direction:column;font-size:13px;color:var(--muted)}
+.sac-jt>b{font-size:17px;font-weight:600;color:var(--ink)}
+.sac-jt small{font-size:11px}
+.sac-sac>b{color:var(--ink)}
+.sac-rond{left:12%;top:12%;width:76%;height:76%}   /* rond jaune seul, sans coche */
+/* Jauge : sac à dos (plus parlant), chiffre dans la poche avant */
+.sac-sac{width:70px;height:84px}
+.sac-sac>b{margin-top:44px;font-size:20px}
