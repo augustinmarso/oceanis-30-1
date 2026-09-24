@@ -603,3 +603,6 @@ img[data-detour]{transition:opacity .25s}
 .pd-objets{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:3px}
 .pd-objets i{font-style:normal;font-size:11px;padding:3px 8px;border-radius:10px;background:var(--neutral)}
 .pd>ol{margin-left:20px;margin-right:20px}
+/* Mon sac : pouce « like » blanc dans le rond jaune d'un produit coché */
+.sac-like{position:absolute;right:17%;top:15%;z-index:2;width:30px;height:30px;border-radius:50%;background:var(--rond,#E9B83F);display:flex;align-items:center;justify-content:center;transform:scale(0);transition:transform .3s}
+.sac-o.ok .sac-like{transform:none}

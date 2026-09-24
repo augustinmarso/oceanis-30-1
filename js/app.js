@@ -84,6 +84,7 @@
     check: (c, s = 12, w = 3) => ic('<path d="M5 12l5 5 9-10"/>', c, s, w),
     play: c => ic('<path d="M8 5.5v13l11-6.5z" fill="' + c + '"/>', c, 14, 2),
     nfc: (c, s = 24) => ic('<path d="M5 9a5 5 0 0 1 0 6"/><path d="M8.5 6.5a9 9 0 0 1 0 11"/><path d="M12 4a13 13 0 0 1 0 16"/><path d="M15.5 2a17 17 0 0 1 0 20"/>', c, s),
+    like: () => ic('<path d="M7 10v12"/><path d="M15 5.9 14 10h5.8a2 2 0 0 1 1.9 2.6l-2.3 8a2 2 0 0 1-1.9 1.4H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.8a2 2 0 0 0 1.8-1.1L12 2a3.1 3.1 0 0 1 3 3.9z"/>', '#FFFFFF', 16, 2.2),
     equipage: () => ic('<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19.5a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9.5" r="2.6"/><path d="M15.5 14.6a4.5 4.5 0 0 1 5.5 4.4"/>', INK, 20),
     soleil: c => ic('<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/>', c, 30, 1.6),
     voile: c => ic('<path d="M9.5 6.2A4 4 0 0 1 15.8 9"/><path d="M9 3v1.4M4.2 5l1 1M3 9.8h1.4"/><path d="M7 19.5h10.5a3.5 3.5 0 0 0 .4-7 5 5 0 0 0-9.6-.7A3.9 3.9 0 0 0 7 19.5z"/>', c, 30, 1.6),
@@ -252,7 +253,7 @@
     const bandeau = t ? `<div class="toast" role="status" aria-live="polite" style="background:${Z[t.zone].couleur}"><span class="ic">${I.nfc(Z[t.zone].couleur)}</span><span class="txt"><small>Élément badgé</small><b>${esc(t.titre)}</b></span><a href="#/badge/${toast}" style="color:${Z[t.zone].couleur}">Ouvrir</a></div>` : '';
     return screen(null, 'background:var(--neutral)', `
       <div class="brand"><div><a class="brand-voyage" href="#/invitation">${esc(VOYAGE.titre)} ›</a><strong>Bienvenue à bord</strong></div>
-        <div style="display:flex;gap:8px"><a class="icon-btn" href="#/parcours" aria-label="Parcours">${I.dossier()}</a><a class="icon-btn" href="#/equipage" aria-label="Organisation à bord">${I.equipage()}</a></div></div>
+        <div style="display:flex;gap:8px"><a class="icon-btn" href="#/parcours" aria-label="Parcours">${I.dossier()}</a><a class="icon-btn" href="#/equipage" aria-label="S’organiser sur le bateau">${I.equipage()}</a></div></div>
       ${boatAt('left:10px;top:130px', 1.08, { mode: 'home', pulse: toast })}
       <span class="hint" style="top:470px">${I.redo()} Touche une couleur ou une pièce</span>
       ${resume}${searchBar()}`, t ? '<div class="veil"></div>' : '') + bandeau;
@@ -487,13 +488,13 @@
         <span class="fbody"><span class="frow"><span>${esc(d.sous)}</span><span>${liste.length}</span></span><span class="kb-cartes">${cartes}</span></span></div>`;
     }).join('');
     return screen(null, 'background:var(--neutral)', `
-      <div class="head"><a class="icon-btn" href="#/" aria-label="Retour">${I.back()}</a><h1>Avant de naviguer</h1></div>
+      <div class="head"><a class="icon-btn" href="#/" aria-label="Retour">${I.back()}</a><h1>S’organiser sur le bateau</h1></div>
       ${ongletsAvant('equipage')}
       <button class="kb-auto" data-repartir>Répartir selon les leçons</button>
       <div class="stack kb" id="kanban"><div style="position:relative;height:${haut + 34 + 16}px">${html}</div></div>`);
   };
-  // « Avant de naviguer » : deux onglets, l'organisation à bord (kanban) et le sac à préparer
-  const ongletsAvant = actif => `<nav class="avant-onglets" aria-label="Avant de naviguer">${[['equipage', 'S’organiser à bord'], ['sac', 'Mon sac']].map(([r, n]) =>
+  // Grande catégorie « S’organiser sur le bateau » (dans l'app, après l'invitation) : les tâches (kanban) et le sac à préparer
+  const ongletsAvant = actif => `<nav class="avant-onglets" aria-label="S’organiser sur le bateau">${[['equipage', 'Les tâches'], ['sac', 'Mon sac']].map(([r, n]) =>
     `<a href="#/${r}"${r === actif ? ' class="on" aria-current="page"' : ''}>${n}</a>`).join('')}</nav>`;
 
   /* Mon sac : ce qu'on emporte (images et fiches Decathlon) ; ce qui manque s'achète ou se loue */
@@ -544,12 +545,12 @@
     const ok = lire(SACK, {}), n = SAC.filter(x => ok[x.id]).length;
     const vie = VIE_A_BORD.map(v => `<li>${imgD(imgDeca(v.img, 160))}<span><b>${esc(v.titre)}</b>${esc(v.texte)}</span></li>`).join('');
     const objets = SAC.map(x => `<div class="sac-o${ok[x.id] ? ' ok' : ''}">
-        <button class="sac-img" ${x.page ? `data-go="#/produit/${x.id}"` : `data-sac="${x.id}"`} aria-pressed="${!!ok[x.id]}" aria-label="${esc(x.nom)} : ${ok[x.id] ? 'je l’ai' : 'je ne l’ai pas'}"><span class="sac-rond"></span>${imgD(imgDeca(x.id))}</button>
+        <button class="sac-img" ${x.page ? `data-go="#/produit/${x.id}"` : `data-sac="${x.id}"`} aria-pressed="${!!ok[x.id]}" aria-label="${esc(x.nom)} : ${ok[x.id] ? 'je l’ai' : 'je ne l’ai pas'}"><span class="sac-rond"></span>${imgD(imgDeca(x.id))}<span class="sac-like">${I.like()}</span></button>
         <b>${esc(x.nom)}</b><small>${esc(x.note)}</small>
         ${ok[x.id] ? `<span class="sac-a">${I.check(INK, 12, 3)} Dans le sac</span>` : `<span class="sac-liens"><a href="${x.page ? `#/produit/${x.id}` : DECATHLON.site + x.lien}"${x.page ? '' : ' target="_blank" rel="noopener"'}>${x.page ? 'Voir' : 'Acheter'}</a>${x.louer ? `<a href="${DECATHLON.location}" target="_blank" rel="noopener">Louer</a>` : ''}</span>`}
       </div>`).join('');
     return screen(null, `background:var(--neutral);--rond:${Z.O.couleur}`, `
-      <div class="head"><a class="icon-btn" href="#/" aria-label="Retour">${I.back()}</a><h1>Avant de naviguer</h1></div>
+      <div class="head"><a class="icon-btn" href="#/" aria-label="Retour">${I.back()}</a><h1>S’organiser sur le bateau</h1></div>
       ${ongletsAvant('sac')}
       <div class="sac">
         <p class="sac-compte"><b>${n}/${SAC.length}</b> dans le sac · touche une image quand tu l'as</p>
@@ -764,7 +765,6 @@
         <div class="iv-photos">${photos}</div>
         <ul class="iv-liste iv-temps">${temps}</ul>
         <p class="iv-promesse">De passager à équipier : ${TOUS.length} gestes à apprendre avant de partir, 2 minutes chacun.</p>
-        <a class="iv-sac" href="#/sac">${imgD(imgDeca('sac', 120))}<span><b>Prépare ton sac</b>La liste, et ce qui manque à acheter ou louer</span>${I.arrow(INK)}</a>
       </div>
       <a class="cta dark iv-go" href="#/" data-embarquer>Je monte à bord ${I.arrow('#FFFFFF')}</a>
     </main>`;
@@ -1120,6 +1120,8 @@
       const box = $stage.querySelector('.sac'); if (box) box.scrollTop = sc;
       const rond = ok[id] && $stage.querySelector(`[data-sac="${id}"] .sac-rond`);
       if (rond) rond.animate([{ transform: 'scale(0)' }, { transform: 'scale(1.08)', offset: 0.7 }, { transform: 'scale(1)' }], { duration: 380, easing: 'cubic-bezier(.3,1.4,.5,1)' });
+      const like = ok[id] && $stage.querySelector(`[data-sac="${id}"] .sac-like`);
+      if (like) like.animate([{ transform: 'scale(0) rotate(-30deg)', opacity: 0 }, { transform: 'scale(1.25) rotate(8deg)', opacity: 1, offset: 0.7 }, { transform: 'none', opacity: 1 }], { duration: 460, delay: 140, easing: 'ease-out', fill: 'backwards' });
       return;
     }
     const fin = e.target.closest('[data-finir]');
