@@ -487,10 +487,37 @@
         <span class="fbody"><span class="frow"><span>${esc(d.sous)}</span><span>${liste.length}</span></span><span class="kb-cartes">${cartes}</span></span></div>`;
     }).join('');
     return screen(null, 'background:var(--neutral)', `
-      <div class="head"><a class="icon-btn" href="#/" aria-label="Retour">${I.back()}</a><h1>À bord</h1></div>
+      <div class="head"><a class="icon-btn" href="#/" aria-label="Retour">${I.back()}</a><h1>Avant de naviguer</h1></div>
+      ${ongletsAvant('equipage')}
       <button class="kb-auto" data-repartir>Répartir selon les leçons</button>
       <div class="stack kb" id="kanban"><div style="position:relative;height:${haut + 34 + 16}px">${html}</div></div>`);
   };
+  // « Avant de naviguer » : deux onglets, l'organisation à bord (kanban) et le sac à préparer
+  const ongletsAvant = actif => `<nav class="avant-onglets" aria-label="Avant de naviguer">${[['equipage', 'Qui fait quoi'], ['sac', 'Mon sac']].map(([r, n]) =>
+    `<a href="#/${r}"${r === actif ? ' class="on" aria-current="page"' : ''}>${n}</a>`).join('')}</nav>`;
+
+  /* Mon sac : ce qu'on emporte (images et fiches Decathlon) ; ce qui manque s'achète ou se loue */
+  const SACK = 'oceanis301:sac';
+  const imgDeca = (id, t = 400) => `${DECATHLON.images}${SAC.find(x => x.id === id).img}/picture.jpg?format=auto&f=${t}x${t}`;
+  V.sac = () => {
+    const ok = lire(SACK, {}), n = SAC.filter(x => ok[x.id]).length;
+    const vie = VIE_A_BORD.map(v => `<li><img src="${imgDeca(v.img, 160)}" alt="" loading="lazy"><span><b>${esc(v.titre)}</b>${esc(v.texte)}</span></li>`).join('');
+    const objets = SAC.map(x => `<div class="sac-o${ok[x.id] ? ' ok' : ''}">
+        <button class="sac-img" data-sac="${x.id}" aria-pressed="${!!ok[x.id]}" aria-label="${esc(x.nom)} : ${ok[x.id] ? 'je l’ai' : 'je ne l’ai pas'}"><img src="${imgDeca(x.id)}" alt="" loading="lazy"><i>${I.check('#FFFFFF', 12, 3.5)}</i></button>
+        <b>${esc(x.nom)}</b><small>${esc(x.note)}</small>
+        ${ok[x.id] ? '<span class="sac-a">Dans le sac</span>' : `<span class="sac-liens"><a href="${DECATHLON.site}${x.lien}" target="_blank" rel="noopener">Acheter</a>${x.louer ? `<a href="${DECATHLON.location}" target="_blank" rel="noopener">Louer</a>` : ''}</span>`}
+      </div>`).join('');
+    return screen(null, 'background:var(--neutral)', `
+      <div class="head"><a class="icon-btn" href="#/" aria-label="Retour">${I.back()}</a><h1>Avant de naviguer</h1></div>
+      ${ongletsAvant('sac')}
+      <div class="sac">
+        <p class="sac-compte"><b>${n}/${SAC.length}</b> dans le sac · touche une image quand tu l'as</p>
+        <section><h2>Vie à bord</h2><ul class="sac-vie">${vie}</ul></section>
+        <section><h2>À emporter</h2><div class="sac-grille">${objets}</div></section>
+        <p class="sac-source">Équipements et images : Decathlon. Ce qui te manque s'achète en ligne, ou se loue pour le week-end.</p>
+      </div>`);
+  };
+
   // Fiche d'une tâche : explication, à qui elle est confiée, « Marquer comme finie »
   V.tache = id => {
     const t = TACHES.find(x => x.id === id);
@@ -670,6 +697,7 @@
         <div class="iv-photos">${photos}</div>
         <ul class="iv-liste iv-temps">${temps}</ul>
         <p class="iv-promesse">De passager à équipier : ${TOUS.length} gestes à apprendre avant de partir, 2 minutes chacun.</p>
+        <a class="iv-sac" href="#/sac"><img src="${imgDeca('sac', 120)}" alt=""><span><b>Prépare ton sac</b>La liste, et ce qui manque à acheter ou louer</span>${I.arrow(INK)}</a>
       </div>
       <a class="cta dark iv-go" href="#/" data-embarquer>Je monte à bord ${I.arrow('#FFFFFF')}</a>
     </main>`;
@@ -864,6 +892,7 @@
       case 'invitation': html = V.invitation(); break;
       case 'inviter': html = V.inviter(); break;
       case 'tache': html = V.tache(a); break;
+      case 'sac': html = V.sac(); break;
       case 'rejoindre': html = V.rejoindre(); break;
       default: html = V.home();
     }
@@ -1009,6 +1038,14 @@
     if (e.target.closest('[data-embarquer]')) { try { localStorage.setItem(INVITE_VUE, '1'); } catch (x) { /* stockage indisponible */ } }
     if (e.target.closest('[data-rejouer]')) return jouerCarte();
     if (e.target.closest('[data-repartir]')) { ecrire(KANBAN, repartir()); return route(); }
+    const sac = e.target.closest('[data-sac]');
+    if (sac) {
+      const ok = lire(SACK, {}), id = sac.dataset.sac, sc = ($stage.querySelector('.sac') || {}).scrollTop || 0;
+      if (ok[id]) delete ok[id]; else ok[id] = true;
+      ecrire(SACK, ok); route();
+      const box = $stage.querySelector('.sac'); if (box) box.scrollTop = sc;
+      return;
+    }
     const fin = e.target.closest('[data-finir]');
     if (fin) {
       const f = finies(), id = fin.dataset.finir;

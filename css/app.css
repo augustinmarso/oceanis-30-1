@@ -380,7 +380,7 @@ body.plein .fs-sortie{display:flex}
 .iv-go{bottom:16px;z-index:5}
 
 /* ───── Organisation à bord : kanban minimaliste ───── */
-.kb-auto{position:absolute;right:16px;top:28px;border:0;background:none;padding:4px 0;font:inherit;font-size:12px;font-weight:500;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.kb-auto{position:absolute;right:20px;top:124px;border:0;background:none;padding:4px 0;font:inherit;font-size:12px;font-weight:500;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .kb-t{background:#fff;border-radius:10px;padding:9px 10px 9px 12px;position:relative;cursor:grab;touch-action:none;user-select:none;display:flex;flex-direction:column;gap:2px}
 .kb-t b{font-size:12px;font-weight:500;line-height:1.3}
 .kb-t small{font-size:10.5px;color:var(--muted)}
@@ -408,7 +408,7 @@ body.plein .fs-sortie{display:flex}
 .rj-note{margin:14px 0 0;font-size:11.5px;opacity:.6;line-height:1.4}
 
 /* Kanban en dossiers (comme le Parcours) : un dossier par équipier, on y glisse les tâches */
-.kb.stack{top:80px}
+.kb.stack{top:152px}
 .kb-cartes{display:flex;flex-direction:column;gap:6px;margin-top:6px}
 .kb-col.kb-vise>svg path{filter:brightness(.93)}
 .kb-vide{height:34px;border-radius:10px;border:1.5px dashed currentColor;opacity:.4;display:flex;align-items:center;justify-content:center;font-size:11.5px}
@@ -503,3 +503,41 @@ body.mediation{cursor:default}
 html:has(body.defile){overflow-y:auto}
 body.partage.defile{position:relative;overflow:visible;inset:auto}
 body.defile #stage{top:0;transform-origin:50% 0}
+
+/* ───── Avant de naviguer : onglets Qui fait quoi · Mon sac ───── */
+.avant-onglets{position:absolute;left:20px;top:80px;display:flex;gap:4px;background:#fff;border-radius:18px;padding:3px}
+.avant-onglets a{height:30px;padding:0 13px;border-radius:15px;display:flex;align-items:center;font-size:12.5px;font-weight:500;color:var(--muted)}
+.avant-onglets a.on{background:var(--ink);color:#fff}
+/* Mon sac */
+.sac{position:absolute;left:0;right:0;top:124px;bottom:0;overflow-y:auto;padding:0 16px 24px;scrollbar-width:none}
+.sac-compte{margin:4px 4px 0;font-size:12px;color:var(--muted)}
+.sac-compte b{color:var(--ink);font-weight:600}
+.sac section{margin-top:16px}
+.sac h2{margin:0 4px 8px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.sac-vie{list-style:none;margin:0;padding:0;background:#fff;border-radius:16px;overflow:hidden}
+.sac-vie li{display:flex;gap:12px;align-items:center;padding:10px 12px;border-top:1px solid var(--line)}
+.sac-vie li:first-child{border-top:0}
+.sac-vie img{width:52px;height:52px;object-fit:contain;flex-shrink:0;background:#fff}
+.sac-vie span{display:flex;flex-direction:column;gap:2px;font-size:12px;line-height:1.4;color:var(--muted)}
+.sac-vie b{font-size:13px;font-weight:600;color:var(--ink)}
+.sac-grille{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sac-o{background:#fff;border-radius:16px;padding:8px 8px 10px;display:flex;flex-direction:column;gap:2px}
+.sac-img{position:relative;border:0;padding:0;background:#fff;border-radius:10px;aspect-ratio:1;cursor:pointer;margin-bottom:4px}
+.sac-img img{width:100%;height:100%;object-fit:contain;display:block}
+.sac-img i{position:absolute;right:6px;top:6px;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center}
+.sac-img i svg{opacity:0}
+.sac-o.ok .sac-img i{background:var(--ink);border-color:var(--ink)}
+.sac-o.ok .sac-img i svg{opacity:1}
+.sac-o.ok .sac-img img{opacity:.55}
+.sac-o b{font-size:12.5px;font-weight:600;padding:0 4px}
+.sac-o small{font-size:10.5px;line-height:1.35;color:var(--muted);padding:0 4px;min-height:28px}
+.sac-liens{display:flex;gap:6px;margin-top:6px;padding:0 2px}
+.sac-liens a{flex:1;height:28px;border-radius:14px;border:1.5px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600}
+.sac-liens a:first-child{background:var(--ink);color:#fff}
+.sac-a{margin-top:6px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11.5px;color:var(--muted)}
+.sac-source{margin:16px 4px 0;font-size:10.5px;color:var(--muted);line-height:1.4}
+/* Invitation : lien vers le sac */
+.iv-sac{display:flex;align-items:center;gap:12px;margin:18px 0 0;padding:10px 14px 10px 10px;border-radius:16px;background:var(--neutral)}
+.iv-sac img{width:48px;height:48px;object-fit:contain;background:#fff;border-radius:10px}
+.iv-sac span{flex:1;display:flex;flex-direction:column;font-size:11.5px;color:var(--muted)}
+.iv-sac b{font-size:13.5px;font-weight:600;color:var(--ink)}
