@@ -485,7 +485,10 @@ body.mediation{background:#fff}
 .md-qr svg{display:block;width:100%;height:100%}
 .md-qr.sans-qr{height:auto;font-size:14px;word-break:break-all}
 .md-code small{font-size:clamp(12px,1.2vw,15px);color:var(--muted)}
-.md-sortir{position:fixed;top:16px;right:16px;border:0;background:none;font:inherit;font-size:11px;color:var(--muted);opacity:.5;cursor:pointer}
+.md-coin{position:fixed;top:14px;right:16px;display:flex;gap:14px}
+.md-coin button{border:0;background:none;font:inherit;font-size:11px;color:var(--muted);opacity:.55;cursor:pointer;padding:4px}
+.md-coin button:hover{opacity:1}
+body.mediation{cursor:default}
 @media (max-aspect-ratio:1/1){#mediation{flex-direction:column}.md-texte{align-items:center;text-align:center}.md-texte ol{justify-content:center}.md-qr{width:min(70vw,50vh);height:min(70vw,50vh)}}
 /* Choix du mode à l'arrivée */
 #choix-mode{position:fixed;inset:0;z-index:200;background:rgba(16,35,58,.35);display:flex;align-items:center;justify-content:center;font-family:'Segoe UI',system-ui,sans-serif}

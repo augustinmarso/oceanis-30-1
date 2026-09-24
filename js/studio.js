@@ -106,7 +106,7 @@
   pt.innerHTML = `<h2>Médiation</h2><p class="s-sub">Tout l'écran affiche un QR code : le visiteur le scanne et l'app s'ouvre en plein écran sur son téléphone.</p>
     <div class="s-btns"><button data-mediation>Lancer la médiation</button></div>`;
   col.insertBefore(pt, card);
-  pt.addEventListener('click', e => { if (e.target.closest('[data-mediation]')) location.href = location.pathname + '?mode=mediation'; });
+  pt.addEventListener('click', e => { if (e.target.closest('[data-mediation]')) A.lancerMediation(); });   // sans rechargement : plein écran réel
 
   /* ───── Réinitialiser : on repart du tout début (invitation WhatsApp), couleurs choisies conservées ───── */
   const rz = document.createElement('section');

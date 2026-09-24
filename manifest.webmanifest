@@ -1,1 +1,1 @@
-{"name":"Oceanis 30.1 — Microlearning","short_name":"Oceanis 30.1","lang":"fr","start_url":"./#/","display":"standalone","background_color":"#FFFFFF","theme_color":"#FFFFFF"}
+{"name":"Oceanis 30.1 — Microlearning","short_name":"Oceanis 30.1","lang":"fr","start_url":"./?mode=partage#/","display":"fullscreen","display_override":["fullscreen","standalone"],"orientation":"portrait","background_color":"#FFFFFF","theme_color":"#FFFFFF"}
