@@ -5,6 +5,11 @@
   'use strict';
 
   const $stage = document.getElementById('stage');
+  // Deux modes : « dev » (téléphone encadré + panneau d'outils à côté) et « partage » (médiation, après scan du QR code) :
+  // l'app occupe tout l'écran de l'appareil, sans cadre ni outils. ?mode=partage dans l'adresse.
+  const PARTAGE = new URLSearchParams(location.search).get('mode') === 'partage';
+  document.body.classList.toggle('partage', PARTAGE);
+  const lienPartage = (h = '') => (/^(localhost|127\.|192\.168\.)/.test(location.hostname) ? URL_PUBLIQUE : location.origin + location.pathname) + '?mode=partage' + h;
   const Z = Object.fromEntries(ZONES.map(z => [z.id, z]));
   const zoneOf = id => Z[id];
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -552,7 +557,7 @@
 
   /* ───────────── Avant tout : le skipper invite ses amis dans le groupe WhatsApp ─────────────
      Il partage un lien ; l'ami qui l'ouvre arrive sur « Rejoindre » : il entre son prénom, puis découvre le voyage. */
-  const lienInvitation = () => location.href.split('#')[0] + '#/rejoindre';
+  const lienInvitation = () => lienPartage('#/rejoindre');
   const messageWhatsApp = () => `⛵ ${VOYAGE.titre} · ${VOYAGE.dates}\n${VOYAGE.sous}.\nDe passager à équipier : prépare-toi en 2 min par geste, ton poste à bord t'attend.\nRejoins l'équipage : ${lienInvitation()}`;
   V.inviter = () => {
     const places = EQUIPAGE.length;
@@ -1064,14 +1069,15 @@
     if (e.key === 'Escape') { if ($stage.querySelector('.vmodal')) closeVideo(); else back('#/'); }
   });
 
-  window.OCEANIS = { V, get S() { return S; }, save, esc, I, ic, screen, homeBtn, go, route, Z };
+  window.OCEANIS = { lienPartage, V, get S() { return S; }, save, esc, I, ic, screen, homeBtn, go, route, Z };
 
   /* ───────────── Mise à l'échelle ───────────── */
   function fit() {
     const vw = window.innerWidth, vh = window.innerHeight;
-    const phone = vw <= 560 || matchMedia('(pointer:coarse)').matches && vw < vh;
+    const phone = PARTAGE || vw <= 560 || matchMedia('(pointer:coarse)').matches && vw < vh;
     let s, h;
-    if (phone) { s = vw / 390; h = Math.max(700, vh / s); }
+    if (PARTAGE && vw / vh > 0.62) { s = vh / 844; h = 844; }                 // partage sur écran large : toute la hauteur
+    else if (phone) { s = vw / 390; h = Math.max(700, vh / s); }
     else { s = Math.min(document.fullscreenElement ? 9 : 1, (vh - 48) / 844, (vw - 48) / 390); h = 844; }   // plein écran : agrandi à la hauteur
     document.body.classList.toggle('framed', !phone);
     document.documentElement.style.setProperty('--h', h + 'px');

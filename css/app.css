@@ -460,3 +460,12 @@ body.sans3d .iv-profil .slot3d{display:none}
 #sidecol .s-gamme i{width:12px;height:16px}
 #sidecol .s-gamme i:first-child{border-radius:3px 0 0 3px}
 #sidecol .s-gamme i:last-child{border-radius:0 3px 3px 0}
+/* Mode partage (médiation) : plein écran, ni cadre de téléphone ni panneau d'outils */
+body.partage #sidecol,body.partage #tools,body.partage .fs-sortie{display:none!important}
+body.partage{background:#fff}
+body.partage #stage{border-radius:0;box-shadow:none}
+/* Panneau : QR code du mode partage */
+#sidecol .s-qr{width:132px;height:132px;margin:4px auto 6px;font-size:10px;word-break:break-all;color:var(--o-mut)}
+#sidecol .s-qr svg{display:block;width:100%;height:100%}
+html:has(body.partage){overflow:hidden;height:100%}
+body.partage{overflow:hidden;position:fixed;inset:0;width:100%;height:100%}

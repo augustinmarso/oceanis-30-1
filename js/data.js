@@ -3,6 +3,8 @@
    La progression d'une zone = actions validées / actions de la zone. */
 
 const INK = '#10233A';
+// Adresse publique de l'app (GitHub Pages) : cible du QR code et des liens d'invitation envoyés depuis le mode dev local
+const URL_PUBLIQUE = 'https://augustinmarso.github.io/oceanis-30-1/';
 const MUTED = '#5B6573';
 
 const ZONES = [
