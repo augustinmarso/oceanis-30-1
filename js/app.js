@@ -493,21 +493,62 @@
       <div class="stack kb" id="kanban"><div style="position:relative;height:${haut + 34 + 16}px">${html}</div></div>`);
   };
   // « Avant de naviguer » : deux onglets, l'organisation à bord (kanban) et le sac à préparer
-  const ongletsAvant = actif => `<nav class="avant-onglets" aria-label="Avant de naviguer">${[['equipage', 'Qui fait quoi'], ['sac', 'Mon sac']].map(([r, n]) =>
+  const ongletsAvant = actif => `<nav class="avant-onglets" aria-label="Avant de naviguer">${[['equipage', 'S’organiser à bord'], ['sac', 'Mon sac']].map(([r, n]) =>
     `<a href="#/${r}"${r === actif ? ' class="on" aria-current="page"' : ''}>${n}</a>`).join('')}</nav>`;
 
   /* Mon sac : ce qu'on emporte (images et fiches Decathlon) ; ce qui manque s'achète ou se loue */
   const SACK = 'oceanis301:sac';
   const imgDeca = (id, t = 400) => `${DECATHLON.images}${SAC.find(x => x.id === id).img}/picture.jpg?format=auto&f=${t}x${t}`;
+  /* Détourage : les photos Decathlon ont un fond clair uni. On le rend transparent en partant des bords
+     (remplissage par diffusion, tolérance sur l'écart à la couleur du fond, bord adouci). Résultat gardé en mémoire. */
+  const decoupes = new Map();
+  const imgD = (u, alt = '') => `<img src="${decoupes.get(u) || u}" data-detour="${u}"${decoupes.has(u) ? ' class="detoure"' : ''} alt="${alt}" crossorigin="anonymous">`;
+  function detourer(u) {
+    if (decoupes.has(u) || detourer[u]) return;
+    detourer[u] = 1;
+    const im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.onload = () => {
+      const W = im.naturalWidth, H = im.naturalHeight, c = document.createElement('canvas');
+      c.width = W; c.height = H;
+      const g = c.getContext('2d', { willReadFrequently: true });
+      g.drawImage(im, 0, 0);
+      const d = g.getImageData(0, 0, W, H), px = d.data;
+      // Fond = zone claire et peu colorée reliée aux bords ; on avance de proche en proche tant que la teinte varie
+      // doucement (suit les dégradés et les fonds en deux tons), puis on adoucit d'un pixel le bord de la silhouette.
+      const clair = i => { const r = px[i * 4], v = px[i * 4 + 1], b = px[i * 4 + 2]; return (r + v + b) / 3 > 168 && Math.max(r, v, b) - Math.min(r, v, b) < 34; };
+      const pas = (i, j) => Math.abs(px[i * 4] - px[j * 4]) + Math.abs(px[i * 4 + 1] - px[j * 4 + 1]) + Math.abs(px[i * 4 + 2] - px[j * 4 + 2]);
+      const fond = new Uint8Array(W * H), pile = [];
+      const bord = [];
+      for (let x = 0; x < W; x++) bord.push(x, (H - 1) * W + x);
+      for (let y = 1; y < H - 1; y++) bord.push(y * W, y * W + W - 1);
+      bord.forEach(i => { if (clair(i)) { fond[i] = 1; pile.push(i); } });
+      const voisins = i => { const x = i % W, y = (i / W) | 0; return [x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, y > 0 ? i - W : -1, y < H - 1 ? i + W : -1]; };
+      while (pile.length) {
+        const i = pile.pop();
+        for (const j of voisins(i)) if (j >= 0 && !fond[j] && clair(j) && pas(i, j) < 18) { fond[j] = 1; pile.push(j); }
+      }
+      for (let i = 0; i < W * H; i++) {
+        if (fond[i]) { px[i * 4 + 3] = 0; continue; }
+        if (voisins(i).some(j => j >= 0 && fond[j]) && clair(i)) px[i * 4 + 3] = 150;   // lisière adoucie
+      }
+      g.putImageData(d, 0, 0);
+      const url = c.toDataURL('image/png');
+      decoupes.set(u, url);
+      $stage.querySelectorAll('img[data-detour]').forEach(x => { if (x.dataset.detour === u) { x.src = url; x.classList.add('detoure'); } });
+    };
+    im.onerror = () => { $stage.querySelectorAll('img[data-detour]').forEach(x => { if (x.dataset.detour === u) x.classList.add('detoure'); }); };
+    im.src = u;
+  }
   V.sac = () => {
     const ok = lire(SACK, {}), n = SAC.filter(x => ok[x.id]).length;
-    const vie = VIE_A_BORD.map(v => `<li><img src="${imgDeca(v.img, 160)}" alt="" loading="lazy"><span><b>${esc(v.titre)}</b>${esc(v.texte)}</span></li>`).join('');
+    const vie = VIE_A_BORD.map(v => `<li>${imgD(imgDeca(v.img, 160))}<span><b>${esc(v.titre)}</b>${esc(v.texte)}</span></li>`).join('');
     const objets = SAC.map(x => `<div class="sac-o${ok[x.id] ? ' ok' : ''}">
-        <button class="sac-img" data-sac="${x.id}" aria-pressed="${!!ok[x.id]}" aria-label="${esc(x.nom)} : ${ok[x.id] ? 'je l’ai' : 'je ne l’ai pas'}"><img src="${imgDeca(x.id)}" alt="" loading="lazy"><i>${I.check('#FFFFFF', 12, 3.5)}</i></button>
+        <button class="sac-img" data-sac="${x.id}" aria-pressed="${!!ok[x.id]}" aria-label="${esc(x.nom)} : ${ok[x.id] ? 'je l’ai' : 'je ne l’ai pas'}"><span class="sac-rond"></span>${imgD(imgDeca(x.id))}</button>
         <b>${esc(x.nom)}</b><small>${esc(x.note)}</small>
-        ${ok[x.id] ? '<span class="sac-a">Dans le sac</span>' : `<span class="sac-liens"><a href="${DECATHLON.site}${x.lien}" target="_blank" rel="noopener">Acheter</a>${x.louer ? `<a href="${DECATHLON.location}" target="_blank" rel="noopener">Louer</a>` : ''}</span>`}
+        ${ok[x.id] ? `<span class="sac-a">${I.check(INK, 12, 3)} Dans le sac</span>` : `<span class="sac-liens"><a href="${DECATHLON.site}${x.lien}" target="_blank" rel="noopener">Acheter</a>${x.louer ? `<a href="${DECATHLON.location}" target="_blank" rel="noopener">Louer</a>` : ''}</span>`}
       </div>`).join('');
-    return screen(null, 'background:var(--neutral)', `
+    return screen(null, `background:var(--neutral);--rond:${Z.O.couleur}`, `
       <div class="head"><a class="icon-btn" href="#/" aria-label="Retour">${I.back()}</a><h1>Avant de naviguer</h1></div>
       ${ongletsAvant('sac')}
       <div class="sac">
@@ -697,7 +738,7 @@
         <div class="iv-photos">${photos}</div>
         <ul class="iv-liste iv-temps">${temps}</ul>
         <p class="iv-promesse">De passager à équipier : ${TOUS.length} gestes à apprendre avant de partir, 2 minutes chacun.</p>
-        <a class="iv-sac" href="#/sac"><img src="${imgDeca('sac', 120)}" alt=""><span><b>Prépare ton sac</b>La liste, et ce qui manque à acheter ou louer</span>${I.arrow(INK)}</a>
+        <a class="iv-sac" href="#/sac">${imgD(imgDeca('sac', 120))}<span><b>Prépare ton sac</b>La liste, et ce qui manque à acheter ou louer</span>${I.arrow(INK)}</a>
       </div>
       <a class="cta dark iv-go" href="#/" data-embarquer>Je monte à bord ${I.arrow('#FFFFFF')}</a>
     </main>`;
@@ -906,6 +947,7 @@
       watchInline();
       scrollHints();
       if (name === 'parcours') animerDossiers(avant);
+      $stage.querySelectorAll('img[data-detour]:not(.detoure)').forEach(i => detourer(i.dataset.detour));
       if (name === 'invitation') jouerCarte();
       if (deblocage && name === '') jouerDeblocage(deblocage);
       if (window.OCEANIS3D) window.OCEANIS3D.attach();
@@ -1042,8 +1084,12 @@
     if (sac) {
       const ok = lire(SACK, {}), id = sac.dataset.sac, sc = ($stage.querySelector('.sac') || {}).scrollTop || 0;
       if (ok[id]) delete ok[id]; else ok[id] = true;
-      ecrire(SACK, ok); route();
+      ecrire(SACK, ok);
+      const t = window.OCEANIS.transition; window.OCEANIS.transition = p => p();   // sur place, sans fondu d'écran
+      route(); window.OCEANIS.transition = t;
       const box = $stage.querySelector('.sac'); if (box) box.scrollTop = sc;
+      const rond = ok[id] && $stage.querySelector(`[data-sac="${id}"] .sac-rond`);
+      if (rond) rond.animate([{ transform: 'scale(0)' }, { transform: 'scale(1.08)', offset: 0.7 }, { transform: 'scale(1)' }], { duration: 380, easing: 'cubic-bezier(.3,1.4,.5,1)' });
       return;
     }
     const fin = e.target.closest('[data-finir]');
