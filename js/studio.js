@@ -99,21 +99,14 @@
     ZONES.forEach(z => appliquer(z.id)); save(); draw(); rendre();
   });
 
-  /* ───── Mode partage / médiation : QR code à scanner → l'app en plein écran sur le téléphone ───── */
+  /* ───── Médiation : grand QR code plein écran, à scanner par les visiteurs (voir js/modes.js) ───── */
   const pt = document.createElement('section');
   pt.className = 's-card';
-  pt.setAttribute('aria-label', 'Mode partage');
-  const urlPartage = A.lienPartage('#/rejoindre');   // la personne qui scanne arrive sur « Rejoindre » (son prénom), puis le voyage
-  pt.innerHTML = `<h2>Mode partage</h2><p class="s-sub">Pour la médiation : scanne le code, l'app s'ouvre en plein écran sur le téléphone, sans ce panneau.</p>
-    <div class="s-qr" aria-label="QR code vers le mode partage"></div>
-    <div class="s-btns"><button data-ouvrir>Ouvrir ici en plein écran</button></div>`;
+  pt.setAttribute('aria-label', 'Médiation');
+  pt.innerHTML = `<h2>Médiation</h2><p class="s-sub">Tout l'écran affiche un QR code : le visiteur le scanne et l'app s'ouvre en plein écran sur son téléphone.</p>
+    <div class="s-btns"><button data-mediation>Lancer la médiation</button></div>`;
   col.insertBefore(pt, card);
-  // QR code dessiné en SVG (bibliothèque qrcode-generator chargée à la demande) ; sans réseau : l'adresse en clair
-  import('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/+esm').then(m => {
-    const qr = m.default(0, 'M'); qr.addData(urlPartage); qr.make();
-    pt.querySelector('.s-qr').innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
-  }).catch(() => { pt.querySelector('.s-qr').textContent = urlPartage; });
-  pt.addEventListener('click', e => { if (e.target.closest('[data-ouvrir]')) location.href = location.pathname + '?mode=partage' + location.hash; });
+  pt.addEventListener('click', e => { if (e.target.closest('[data-mediation]')) location.href = location.pathname + '?mode=mediation'; });
 
   /* ───── Réinitialiser : on repart du tout début (invitation WhatsApp), couleurs choisies conservées ───── */
   const rz = document.createElement('section');
