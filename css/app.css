@@ -451,3 +451,12 @@ body.sans3d .iv-profil .slot3d{display:none}
 /* « Je monte à bord » apparaît à la fin du plan de caméra */
 .iv-go{transition:opacity .6s ease,transform .6s cubic-bezier(.2,.9,.3,1.2)}
 .iv-go.attend{opacity:0;transform:translateY(24px);pointer-events:none}
+/* Panneau : gammes de couleurs toutes prêtes */
+#sidecol .s-gammes{display:flex;flex-direction:column;gap:5px;margin:2px 0 6px}
+#sidecol .s-gamme{display:flex;align-items:center;gap:8px;height:30px;padding:0 8px;border-radius:5px;border:1px solid var(--o-lig);background:var(--o-btn);color:var(--o-txt);font-size:12px;text-align:left;cursor:pointer}
+#sidecol .s-gamme:hover{background:#f0f0f0}
+#sidecol .s-gamme.on{border-color:var(--o-txt)}
+#sidecol .s-gamme span{display:flex}
+#sidecol .s-gamme i{width:12px;height:16px}
+#sidecol .s-gamme i:first-child{border-radius:3px 0 0 3px}
+#sidecol .s-gamme i:last-child{border-radius:0 3px 3px 0}

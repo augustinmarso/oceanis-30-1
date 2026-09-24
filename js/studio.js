@@ -52,8 +52,18 @@
   card.setAttribute('aria-label', 'Couleurs des catégories');
   col.appendChild(card);
 
+  // Gammes toutes prêtes : une couleur par zone (B horizontal GV, P sécurité, O conduite, J vertical GV, V voile avant)
+  const GAMMES = [
+    { nom: 'Officielle', couleurs: null },
+    { nom: 'Gamme colorée 1', couleurs: { B: '#1E405B', P: '#504443', O: '#E9B83F', J: '#EBD15C', V: '#A0B6B3' } },
+  ];
+  const gammeActive = () => GAMMES.findIndex(g => g.couleurs
+    ? ZONES.every(z => (choix[z.id] || '').toUpperCase() === g.couleurs[z.id])
+    : !Object.keys(choix).length);
   function draw() {
-    card.innerHTML = `<h2>Couleurs</h2><p class="s-sub">Une couleur par catégorie, au choix.</p>
+    const act = gammeActive();
+    card.innerHTML = `<h2>Couleurs</h2><p class="s-sub">Une gamme toute prête, ou une couleur par catégorie.</p>
+      <div class="s-gammes">${GAMMES.map((g, i) => `<button class="s-gamme${i === act ? ' on' : ''}" data-gamme="${i}"><span>${ZONES.map(z => `<i style="background:${g.couleurs ? g.couleurs[z.id] : OFFICIEL[z.id].couleur}"></i>`).join('')}</span>${g.nom}</button>`).join('')}</div>
       ${ZONES.map(z => {
         const perso = choix[z.id] && choix[z.id].toUpperCase() !== OFFICIEL[z.id].couleur.toUpperCase();
         return `<div class="s-coul">
@@ -85,6 +95,7 @@
     if (!b) return;
     if (b.dataset.officiel) delete choix[b.dataset.officiel];
     if (b.hasAttribute('data-tout')) choix = {};
+    if (b.dataset.gamme != null) { const g = GAMMES[+b.dataset.gamme]; choix = g.couleurs ? { ...g.couleurs } : {}; }
     ZONES.forEach(z => appliquer(z.id)); save(); draw(); rendre();
   });
 
