@@ -565,3 +565,8 @@ img[data-detour]{transition:opacity .25s}
 .sac-o.large b{font-size:14px}
 .sac-contenu{list-style:none;margin:6px 4px 0;padding:0;display:flex;flex-wrap:wrap;gap:4px 6px}
 .sac-contenu li{font-size:10.5px;padding:3px 8px;border-radius:10px;background:var(--neutral);color:var(--ink)}
+/* Mon sac : l'encart blanc commence à mi-hauteur de l'image (le produit déborde au-dessus, sur le fond) */
+.sac-o{background:none;position:relative;container-type:inline-size}
+.sac-o::before{content:'';position:absolute;left:0;right:0;bottom:0;top:calc(8px + (100cqw - 16px) / 2);background:#fff;border-radius:0 0 16px 16px;z-index:0}
+.sac-o.large::before{top:calc(8px + (100cqw - 16px) * 3 / 8)}
+.sac-o>*{position:relative;z-index:1}
