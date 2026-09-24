@@ -498,7 +498,7 @@
 
   /* Mon sac : ce qu'on emporte (images et fiches Decathlon) ; ce qui manque s'achète ou se loue */
   const SACK = 'oceanis301:sac';
-  const imgDeca = (id, t = 400) => `${DECATHLON.images}${SAC.find(x => x.id === id).img}/picture.jpg?format=auto&f=${t}x${t}`;
+  const imgDeca = (id, t = 400) => { const x = SAC.find(o => o.id === id); return x.src || `${DECATHLON.images}${x.img}/picture.jpg?format=auto&f=${t}x${t}`; };
   /* Détourage : les photos Decathlon ont un fond clair uni. On le rend transparent en partant des bords
      (remplissage par diffusion, tolérance sur l'écart à la couleur du fond, bord adouci). Résultat gardé en mémoire. */
   const decoupes = new Map();
@@ -543,9 +543,9 @@
   V.sac = () => {
     const ok = lire(SACK, {}), n = SAC.filter(x => ok[x.id]).length;
     const vie = VIE_A_BORD.map(v => `<li>${imgD(imgDeca(v.img, 160))}<span><b>${esc(v.titre)}</b>${esc(v.texte)}</span></li>`).join('');
-    const objets = SAC.map(x => `<div class="sac-o${ok[x.id] ? ' ok' : ''}">
+    const objets = SAC.map(x => `<div class="sac-o${ok[x.id] ? ' ok' : ''}${x.large ? ' large' : ''}">
         <button class="sac-img" data-sac="${x.id}" aria-pressed="${!!ok[x.id]}" aria-label="${esc(x.nom)} : ${ok[x.id] ? 'je l’ai' : 'je ne l’ai pas'}"><span class="sac-rond"></span>${imgD(imgDeca(x.id))}</button>
-        <b>${esc(x.nom)}</b><small>${esc(x.note)}</small>
+        <b>${esc(x.nom)}</b><small>${esc(x.note)}</small>${x.contenu ? `<ul class="sac-contenu">${x.contenu.map(c => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}
         ${ok[x.id] ? `<span class="sac-a">${I.check(INK, 12, 3)} Dans le sac</span>` : `<span class="sac-liens"><a href="${DECATHLON.site}${x.lien}" target="_blank" rel="noopener">Acheter</a>${x.louer ? `<a href="${DECATHLON.location}" target="_blank" rel="noopener">Louer</a>` : ''}</span>`}
       </div>`).join('');
     return screen(null, `background:var(--neutral);--rond:${Z.O.couleur}`, `

@@ -609,6 +609,11 @@ const TACHES = [
    louer : l'équipement se loue aussi (Decathlon Location). */
 const DECATHLON = { site: 'https://www.decathlon.fr', images: 'https://contents.mediadecathlon.com/', location: 'https://www.decathlon.fr/circularity/rentals' };
 const SAC = [
+  // Kit à se fournir : photo locale (src), carte pleine largeur (large), contenu détaillé
+  { id: 'mallette', nom: 'La mallette des 5 F de la navigation', large: true, src: 'img/voyage/mallette-5f.jpg',
+    note: 'Une trousse Quechua qui s’ouvre à plat, tout rangé à sa place',
+    contenu: ['Couvertures de survie', 'Multi-outil', 'Compas et crayon', 'Comprimés et collyre', 'Tour de cou polaire', 'Barres de céréales', 'Gourde 500 ml', 'Lampe frontale', 'Mousqueton'],
+    lien: '/search?Ntt=trousse%20de%20rangement%20quechua' },
   { id: 'sac', nom: 'Sac étanche souple', note: 'Duffle 60 L : il se range sous la couchette', img: 'p2831005/k$7a6bac21233e1fcfa4f0e98eaab26cfc', lien: '/p/sac-etanche-duffle-bag-sac-de-voyage-60l-jaune-noir/333985/c290c381m8773849', louer: true },
   { id: 'veste', nom: 'Veste imperméable', note: 'Contre les embruns et le vent', img: 'p2491510/k$5ece759390b53853845aca10773962b2', lien: '/p/blouson-veste-impermeable-de-voile-coupe-vent-sailing-500-homme-gris-noir/327999/c383c381m8612702', louer: true },
   { id: 'pull', nom: 'Pull marin', note: 'Il fait frais le soir au mouillage', img: 'p3214206/k$b22438bc044e19d78d3da48c8682f5f1', lien: '/p/pull-marin-de-voile-homme-100-bleu-marine/310099/c43c43c43m9017988' },

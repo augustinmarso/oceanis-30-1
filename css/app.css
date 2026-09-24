@@ -559,3 +559,9 @@ img[data-detour]{transition:opacity .25s}
 .avant-onglets{left:20px;right:20px;top:82px;justify-content:space-between;background:none;padding:0;border-radius:0}
 .avant-onglets a{height:auto;padding:4px 0;border-radius:0;font-size:13.5px;font-weight:500;color:var(--muted)}
 .avant-onglets a.on{background:none;color:var(--ink);font-weight:600;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:6px}
+/* Mon sac : la mallette (kit complet) en pleine largeur */
+.sac-o.large{grid-column:1 / -1}
+.sac-o.large .sac-img{aspect-ratio:4/3}
+.sac-o.large b{font-size:14px}
+.sac-contenu{list-style:none;margin:6px 4px 0;padding:0;display:flex;flex-wrap:wrap;gap:4px 6px}
+.sac-contenu li{font-size:10.5px;padding:3px 8px;border-radius:10px;background:var(--neutral);color:var(--ink)}
