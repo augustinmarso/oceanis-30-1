@@ -602,9 +602,9 @@
     im.src = u;
   }
   // Jauge : un sac qui grossit à mesure qu'on coche, du jaune sombre au jaune clair (celui des validations)
-  const JAUNE_SOMBRE = '#8F7B22';
+  const JAUNE = '#ECD156', JAUNE_SOMBRE = '#8F7B22';   // jaune de validation (ronds et sac), fixe quelle que soit la couleur des zones
   const jaugeSac = n => {
-    const p = n / SAC.length, c = mix(JAUNE_SOMBRE, Z.J.couleur, p);
+    const p = n / SAC.length, c = mix(JAUNE_SOMBRE, JAUNE, p);
     return `<div class="sac-jauge"><span class="sac-sac" style="--t:${(0.55 + 0.45 * p).toFixed(3)}"><svg viewBox="0 0 64 76" aria-hidden="true">
         <path d="M25 13v-3a7 7 0 0 1 14 0v3" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
         <path d="M10 26C3 34 3 56 10 66M54 26c7 8 7 30 0 40" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round" opacity=".7"/>
@@ -632,7 +632,7 @@
         <b>${esc(x.nom)}</b><small>${esc(x.note)}</small>
         ${ok[x.id] ? `<span class="sac-a">${I.check(INK, 12, 3)} Dans le sac</span>` : `<span class="sac-liens"><a href="${x.page ? `#/produit/${x.id}` : DECATHLON.site + x.lien}"${x.page ? '' : ' target="_blank" rel="noopener"'}>${x.page ? 'Voir' : 'Acheter'}</a>${x.louer ? `<a href="${DECATHLON.location}" target="_blank" rel="noopener">Louer</a>` : ''}</span>`}
       </div>`).join('');
-    return screen(null, `background:var(--neutral);--rond:${Z.J.couleur}`, `
+    return screen(null, `background:var(--neutral);--rond:${JAUNE}`, `
       <div class="head"><a class="icon-btn" href="#/" aria-label="Retour">${I.back()}</a><h1>S’organiser sur le bateau</h1></div>
       ${ongletsAvant('sac')}
       <div class="sac">

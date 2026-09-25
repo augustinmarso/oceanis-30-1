@@ -7,7 +7,7 @@
 (() => {
   'use strict';
   const A = window.OCEANIS;
-  const KEY = 'oceanis301:couleurs-finales';   // nouvelle clé : chacun repart sur les couleurs finales
+  const KEY = 'oceanis301:couleurs-legende';   // nouvelle clé : chacun repart sur les couleurs finales
   const reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ───── Animations discrètes, toujours actives ───── */
@@ -25,7 +25,8 @@
   // Gammes toutes prêtes : une couleur par zone (B horizontal GV, P sécurité, O conduite, J vertical GV, V voile avant)
   const GAMMES = [
     { nom: 'Officielle', couleurs: null },
-    { nom: 'Couleurs finales', couleurs: { B: '#24425C', P: '#514134', O: '#A3B1D3', J: '#ECD156', V: '#A1B8B4' } },
+    // Légende fournie : conduite bleu/violet, horizontal GV jaune, vertical GV vert/bleu, sécurité marron, voile avant bleu foncé
+    { nom: 'Couleurs finales', couleurs: { O: '#A3B1D3', B: '#ECD156', J: '#A1B8B4', P: '#907C67', V: '#24425C' } },
   ];
   // Par défaut (aucun choix enregistré) : Gamme colorée 1. « Officielle » s'enregistre comme {} et reste possible en mode dev.
   const DEFAUT = GAMMES[1].couleurs;
