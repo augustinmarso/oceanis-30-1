@@ -628,8 +628,8 @@
     const sac = $stage.querySelector('.sac-sac');
     if (!sac || sacParti || matchMedia('(prefers-reduced-motion: reduce)').matches) return suite();
     sacParti = true;
-    sac.animate([{ transform: 'none' }, { transform: 'translateX(-6px) rotate(-2deg)', offset: 0.2 }, { transform: 'translateX(520px) rotate(5deg)' }],
-      { duration: 620, easing: 'cubic-bezier(.5,0,.8,.4)', fill: 'forwards' })
+    sac.animate([{ transform: 'none' }, { transform: 'translateX(-12px) rotate(-3deg)', offset: 0.18 }, { transform: 'translateX(60px) rotate(2deg)', offset: 0.45 }, { transform: 'translateX(460px) rotate(6deg)' }],
+      { duration: 900, easing: 'ease-in-out', fill: 'forwards' })
       .finished.then(() => { sacParti = false; suite(); });
   }
   $stage.addEventListener('click', e => {
