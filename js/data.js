@@ -613,18 +613,16 @@ const TACHES = [
    img : identifiant d'image du CDN Decathlon (contents.mediadecathlon.com) ; lien : fiche produit sur decathlon.fr ;
    louer : l'équipement se loue aussi (Decathlon Location). */
 const DECATHLON = { site: 'https://www.decathlon.fr', images: 'https://contents.mediadecathlon.com/', location: 'https://www.decathlon.fr/circularity/rentals' };
+/* Les 9 indispensables à emporter (une case de la trousse chacun) */
 const SAC = [
   { id: 'veste', nom: 'Veste imperméable', note: 'Contre les embruns et le vent', img: 'p2491510/k$5ece759390b53853845aca10773962b2', lien: '/p/blouson-veste-impermeable-de-voile-coupe-vent-sailing-500-homme-gris-noir/327999/c383c381m8612702', louer: true },
   { id: 'pull', nom: 'Pull marin', note: 'Il fait frais le soir au mouillage', img: 'p3214206/k$b22438bc044e19d78d3da48c8682f5f1', lien: '/p/pull-marin-de-voile-homme-100-bleu-marine/310099/c43c43c43m9017988' },
-  { id: 'pantalon', nom: 'Pantalon de voile', note: 'Léger, sèche vite', img: 'p2581386/k$48b4d7577f78dce231064b1d99d3c386', lien: '/p/pantalon-de-voile-en-coton-100-homme-bleu-marine/333951/c43m8647730' },
   { id: 'chaussures', nom: 'Chaussures bateau', note: 'Semelle blanche antidérapante', img: 'p3115061/k$53b674da881fc72676a62ef0696653ca', lien: '/p/chaussures-bateau-cuir-sailing-500-marron/343554/c92m8771988' },
   { id: 'gilet', nom: 'Gilet autogonflant', note: 'Le bateau en a ; le tien est à ta taille', img: 'p1587034/k$bef5f028ceb7e1777fb3e8852920ddca', lien: '/p/gilet-de-sauvetage-automatique-gonflable-adulte-lj-150n-air-noir/170813/c382m8491769', louer: true },
-  { id: 'gants', nom: 'Gants de voile', note: 'Pour les écoutes et le winch', img: 'p2811424/k$9426a28bbe1a3b74a030f9fbb25d9cc5', lien: '/p/gants-de-voile-adulte-2-doigts-coupes-sailing-900-noir/333892/c382c180m8647380' },
   { id: 'lunettes', nom: 'Lunettes polarisées', note: 'La mer réfléchit le soleil', img: 'p3051976/k$3896e8bb91a60b7ce507f0bb01f3033c', lien: '/p/lunettes-de-soleil-sport-polarisees-categorie-3-explore-500-wrp/365352/c210m8942059' },
   { id: 'chapeau', nom: 'Chapeau bateau', note: 'Avec son cordon, contre le vent', img: 'p3105156/k$89c0f51ce37a3c3985a8d1d741dbc141', lien: '/p/chapeau-bateau-adulte-500-france-bleu-marine/333965/c195m8971970' },
   { id: 'creme', nom: 'Crème solaire SPF 50', note: 'Tube 200 ml, à remettre toutes les 2 heures', img: 'p3139843/k$4edf99eef9119ab7017ce448d123388d', lien: '/p/creme-solaire-spf50-200ml/347098/m8803560' },
   { id: 'frontale', nom: 'Lampe frontale', note: 'Pour la nuit, sans éblouir les autres', img: 'p2572886/k$ecd1bf4d819100bc04f8a9438fee4c41', lien: '/p/lampe-frontale-rechargeable-120-lumens-hl100-usb/302568/c195c443m8505682', louer: true },
-  { id: 'serviette', nom: 'Serviette microfibre', note: 'Compacte, sèche en une heure', img: 'p2865244/k$c988e439487b8516cb8faffbff14d235', lien: '/p/serviette-microfibre-ultra-compacte-taille-xl-110-x-175-cm-noir/158653/c382c108m8926381' },
   { id: 'duvet', nom: 'Sac de couchage', note: 'Léger, 20 °C suffit en juin', img: 'p3088710/k$2ed3af0e9d3eedf4fbccee19f005b481', lien: '/p/sac-de-couchage-de-camping-20degc-basic/381859/c386c149c288m9003378', louer: true },
 ];
 /* Vie à bord : les trois règles du bord (illustrées par un produit du sac) */
