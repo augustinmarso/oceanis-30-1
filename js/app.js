@@ -607,27 +607,25 @@
   // Jauge : la trousse dessinée ; chaque produit coché dépose sa pastille dans un compartiment (toujours le même)
   const JAUNE = '#ECD156', JAUNE_SOMBRE = '#8F7B22';   // jaune de validation (ronds des produits), fixe quelle que soit la couleur des zones
   // centres des compartiments sur le dessin (en % de l'image, du fond vers l'avant)
-  const CASES = [[28, 46], [45.5, 41], [62.5, 39], [79.5, 44], [29.5, 54.5], [44.5, 50], [63, 49.5], [79, 52.5], [45.5, 60.5], [64, 58]];
-  const pastilleSac = j => {
-    const [x, y] = CASES[j % CASES.length], d = j >= CASES.length ? 4.5 : 0;     // au-delà de 10 : deuxième pastille dans la case
-    return { x: x + d, y: y - d * 0.6, c: ZONES[j % ZONES.length].couleur };
-  };
+  // (relevés sur le dessin : centre du fond de chaque case, une case par produit)
+  const CASES = [[32.9, 41.2], [43.9, 40.8], [25.3, 45.5], [48.8, 46.8], [60.6, 47.1], [81.3, 48.1], [30.9, 51.6], [41.9, 52.3], [65.5, 53.7], [78, 54.1], [47.3, 59.2], [59.7, 60.2]];
+  const pastilleSac = j => { const [x, y] = CASES[j % CASES.length]; return { x, y: y + 1.2, c: Z.P.couleur }; };   // couleur de la zone Sécurité
   const jaugeSac = n => {
     const ok = lire(SACK, {});
     const pts = SAC.map((x, j) => ok[x.id] ? (p => `<i data-p="${x.id}" style="left:${p.x}%;top:${p.y}%;background:${p.c}"></i>`)(pastilleSac(j)) : '').join('');
-    return `<div class="sac-jauge"><span class="sac-sac"><img src="img/voyage/trousse.png" alt="">${pts}</span>
-      <span class="sac-jt"><b data-n="${n}">${n} / ${SAC.length}</b> dans le sac<small>Touche un produit quand tu l'as</small></span></div>`;
+    return `<div class="sac-jauge"><span class="sac-sac"><img src="img/voyage/trousse.png" alt="">${pts}<b class="sac-n" data-n="${n}">${n}<small>/${SAC.length}</small></b></span>
+      <span class="sac-jt"><b>Dans le sac</b><small>Touche un produit quand tu l'as</small></span></div>`;
   };
   // Après avoir coché : la pastille tombe dans son compartiment, la trousse rebondit, le chiffre monte ou descend
   function animerJauge(avant, id) {
-    const sacEl = $stage.querySelector('.sac-sac'), num = $stage.querySelector('.sac-jt b');
+    const sacEl = $stage.querySelector('.sac-sac'), num = $stage.querySelector('.sac-n');
     if (!sacEl) return;
     const apres = +num.dataset.n;
     sacEl.animate([{ transform: 'scale(1.06)' }, { transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.3,1.5,.5,1)' });
     const pt = id && sacEl.querySelector(`[data-p="${id}"]`);
     if (pt) pt.animate([{ transform: 'translate(-50%,-260%) scale(.6)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.15)', opacity: 1, offset: 0.75 }, { transform: 'translate(-50%,-50%)' }], { duration: 520, easing: 'cubic-bezier(.3,.9,.4,1)' });
     const t0 = performance.now();
-    const tick = t => { const k = Math.min(1, (t - t0) / 350); num.textContent = Math.round(avant + (apres - avant) * k) + ' / ' + SAC.length; if (k < 1) requestAnimationFrame(tick); };
+    const tick = t => { const k = Math.min(1, (t - t0) / 350); num.firstChild.textContent = Math.round(avant + (apres - avant) * k); if (k < 1) requestAnimationFrame(tick); };
     requestAnimationFrame(tick);
   }
   V.sac = () => {
