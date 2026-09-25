@@ -622,22 +622,6 @@
     const pt = n > k(avant) && sacEl.querySelector(`[data-i="${n - 1}"]`);   // la case qui vient de se remplir
     if (pt) pt.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 420, easing: 'ease-out' });
   }
-  // En quittant Mon sac : la trousse recule d'un petit coup puis glisse hors de l'écran, vers la droite
-  let sacParti = false;
-  function emporterSac(suite) {
-    const sac = $stage.querySelector('.sac-sac');
-    if (!sac || sacParti || matchMedia('(prefers-reduced-motion: reduce)').matches) return suite();
-    sacParti = true;
-    sac.animate([{ transform: 'none' }, { transform: 'translateX(-12px) rotate(-3deg)', offset: 0.18 }, { transform: 'translateX(60px) rotate(2deg)', offset: 0.45 }, { transform: 'translateX(460px) rotate(6deg)' }],
-      { duration: 900, easing: 'ease-in-out', fill: 'forwards' })
-      .finished.then(() => { sacParti = false; suite(); });
-  }
-  $stage.addEventListener('click', e => {
-    const a = e.target.closest('a[href^="#/"]');
-    if (!a || e.defaultPrevented || !location.hash.startsWith('#/sac') || a.getAttribute('href').startsWith('#/sac')) return;
-    e.preventDefault();
-    emporterSac(() => { location.hash = a.getAttribute('href'); });
-  }, true);
   V.sac = () => {
     const ok = lire(SACK, {}), n = SAC.filter(x => ok[x.id]).length;
     const objets = SAC.map(x => `<div class="sac-o${ok[x.id] ? ' ok' : ''}">
