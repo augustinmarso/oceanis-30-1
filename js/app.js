@@ -606,7 +606,7 @@
   }
   // Jauge : la trousse dessinée se remplit dans l'ordre, du fond vers l'avant : une case de plus par produit coché
   // les 9 fonds de case (face horizontale, contre le montant droit), relevés sur le dessin (repère de l'image 360 × 364)
-  const CASES = ["83.4,147.8 95.5,144.6 124.3,137.4 135,135.8 136.1,135.8 137.4,160.8 137.3,162.9 135.2,164.1 132,165.3 130.9,165.3 94.4,152", "208.4,150.9 212.4,149.8 226.5,145.5 246.4,142.2 247.4,142.3 247.3,166 244.2,165 214.4,154.2 209.4,152", "140.4,168 141.4,166.9 152.4,163.7 174.3,157.4 192.3,154.1 194.4,154.1 194.1,189.1 191.1,189.2", "267.4,173.8 269.4,172.7 304.1,163.8 306.2,163.9 306.6,178.2 305.2,188.1 304.1,188.1 301,187.3 272.4,175.9", "80.4,183.7 87.5,181.5 126.2,171 127.6,186.9 127.2,208.1 110.5,200.5 83.4,185.8", "200.4,192.7 206.5,190.5 216.7,187 254.1,176.8 254.5,205.4 253.2,216 252.2,216 243,212.2 211.4,197.9", "262.7,178.1 263.7,178 266.8,179 308.6,195 313.6,197.1 315.6,198.2 314.6,199.2 263.8,215.1 262.8,215.1", "135.4,212.9 138.4,211.8 179.9,198.6 187.1,196.8 188.1,196.9 188.1,234.1 184,234.3 167.8,229.6 155.6,223.8", "194.8,196.9 196.9,196.9 241.5,216.5 249.6,220.9 248.6,222 244.6,224.1 226.7,232.4 223.2,233.6 213.1,235.3 205.8,236 195.6,235.7"];
+  const CASES = ["153.4,132.9 156.4,131.8 166.4,129.7 173.5,128.5 191.2,127.6 199.7,128.6 204.3,130.1 210.6,132.7 218.6,136 228.6,140.2 229.6,141.3 216.5,144.6 200.5,148.5 197.2,148.6", "83.4,147.8 95.5,144.6 124.3,137.4 135,135.8 136.1,135.8 137.4,160.8 137.3,162.9 135.2,164.1 132,165.3 130.9,165.3 94.4,152", "208.4,150.9 212.4,149.8 226.5,145.5 246.4,142.2 247.4,142.3 247.3,166 244.2,165 214.4,154.2 209.4,152", "74.8,150 110.5,162.4 118.6,165.8 120.6,166.9 119.6,168 95.9,175.6 79.7,178.9 75.6,179.8 74.4,165.8", "140.4,168 141.4,166.9 152.4,163.7 174.3,157.4 192.3,154.1 194.4,154.1 194.1,189.1 191.1,189.2", "80.4,183.7 87.5,181.5 126.2,171 127.6,186.9 127.2,208.1 110.5,200.5 83.4,185.8", "200.4,192.7 206.5,190.5 216.7,187 254.1,176.8 254.5,205.4 253.2,216 252.2,216 243,212.2 211.4,197.9", "135.4,212.9 138.4,211.8 179.9,198.6 187.1,196.8 188.1,196.9 188.1,234.1 184,234.3 167.8,229.6 155.6,223.8", "194.8,196.9 196.9,196.9 241.5,216.5 249.6,220.9 248.6,222 244.6,224.1 226.7,232.4 223.2,233.6 213.1,235.3 205.8,236 195.6,235.7"];
   const jaugeSac = n => {
     const cases = CASES.slice(0, n).map((pts, i) => `<polygon data-i="${i}" points="${pts}" fill="${Z.P.couleur}"/>`).join('');
     return `<div class="sac-jauge"><span class="sac-jt"><b>Dans le sac</b><small>Touche un produit quand tu l'as</small></span>
@@ -621,6 +621,31 @@
     const pt = n > avant && sacEl.querySelector(`[data-i="${n - 1}"]`);   // la case qui vient de se remplir
     if (pt) pt.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 420, easing: 'ease-out' });
   }
+  // En quittant Mon sac : une main arrive par la droite, saisit la poignée de la trousse et l'emporte hors de l'écran
+  const MAIN = `<svg class="sac-main" viewBox="0 0 400 64" aria-hidden="true" fill="${INK}">
+      <path d="M62 14 C74 10 92 12 108 16 L400 20 L400 52 L110 52 C92 54 76 56 64 52 Z"/>
+      <g class="sac-doigts"><ellipse cx="40" cy="15" rx="17" ry="8"/><ellipse cx="34" cy="27" rx="16" ry="7.5"/><ellipse cx="34" cy="39" rx="16" ry="7.5"/><ellipse cx="38" cy="50" rx="15" ry="7"/>
+      <path d="M44 8 C58 2 76 6 80 16 C70 16 58 16 50 20 Z"/></g>
+      <rect x="400" y="16" width="0" height="0"/></svg>`;
+  let sacParti = false;
+  function emporterSac(suite) {
+    const sac = $stage.querySelector('.sac-sac');
+    if (!sac || sacParti || matchMedia('(prefers-reduced-motion: reduce)').matches) return suite();
+    sacParti = true;
+    sac.insertAdjacentHTML('beforeend', MAIN);
+    const main = sac.querySelector('.sac-main'), doigts = main.querySelector('.sac-doigts');
+    main.animate([{ transform: 'translateX(320px)' }, { transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'both' });
+    doigts.animate([{ transform: 'scaleX(1.25)' }, { transform: 'none' }], { duration: 160, delay: 420, easing: 'ease-out', fill: 'both' });
+    sac.animate([{ transform: 'none' }, { transform: 'translateX(-6px) rotate(-2deg)', offset: 0.2 }, { transform: 'translateX(520px) rotate(5deg)' }],
+      { duration: 620, delay: 600, easing: 'cubic-bezier(.5,0,.8,.4)', fill: 'forwards' })
+      .finished.then(() => { sacParti = false; suite(); });
+  }
+  $stage.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="#/"]');
+    if (!a || e.defaultPrevented || !location.hash.startsWith('#/sac') || a.getAttribute('href').startsWith('#/sac')) return;
+    e.preventDefault();
+    emporterSac(() => { location.hash = a.getAttribute('href'); });
+  }, true);
   V.sac = () => {
     const ok = lire(SACK, {}), n = SAC.filter(x => ok[x.id]).length;
     const objets = SAC.map(x => `<div class="sac-o${ok[x.id] ? ' ok' : ''}">
