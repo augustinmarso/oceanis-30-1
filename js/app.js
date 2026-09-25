@@ -613,9 +613,7 @@
     const cases = CASES.slice(0, Math.round(n * CASES.length / SAC.length)).map((pts, i) => `<polygon data-i="${i}" points="${pts}" fill="${Z.P.couleur}"/>`).join('');
     return `<div class="sac-jauge"><span class="sac-jt"><b>Dans le sac</b><small>Touche un produit quand tu l'as</small></span>
       <span class="sac-sac"><svg viewBox="0 0 360 364" aria-hidden="true">${cases}</svg><img src="img/voyage/trousse.png" alt=""></span>
-      <details class="sac-pas"><summary>Je n'ai pas de sac</summary>
-        <p>Un sac souple qui se plie sous la couchette : pas de valise à bord.</p>
-        <span class="sac-liens"><a href="${DECATHLON.site}${SAC_SOUPLE}" target="_blank" rel="noopener">Acheter</a><a href="${DECATHLON.location}" target="_blank" rel="noopener">Louer</a></span></details></div>`;
+      <details class="sac-pas"><summary>Je n'ai pas de sac</summary><span><a href="${DECATHLON.site}${SAC_SOUPLE}" target="_blank" rel="noopener">Acheter</a> · <a href="${DECATHLON.location}" target="_blank" rel="noopener">Louer</a></span></details></div>`;
   };
   // Après avoir coché : la case se remplit et la trousse rebondit
   function animerJauge(avant, id) {
