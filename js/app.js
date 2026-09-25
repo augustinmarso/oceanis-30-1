@@ -604,22 +604,30 @@
     im.onerror = () => poser(u, null);
     im.src = u;
   }
-  // Jauge : la trousse (dessin) grossit à mesure qu'on coche ; le compteur passe du jaune sombre au jaune clair (celui des validations)
-  const JAUNE = '#ECD156', JAUNE_SOMBRE = '#8F7B22';   // jaune de validation (ronds et sac), fixe quelle que soit la couleur des zones
-  const jaugeSac = n => {
-    const p = n / SAC.length, c = mix(JAUNE_SOMBRE, JAUNE, p);
-    return `<div class="sac-jauge"><span class="sac-sac" style="--t:${(0.55 + 0.45 * p).toFixed(3)}"><img src="img/voyage/trousse.png" alt="">
-        <b data-n="${n}" style="background:${c}">${n}</b></span><span class="sac-jt"><b>${n} / ${SAC.length}</b> dans le sac<small>Touche un produit quand tu l'as</small></span></div>`;
+  // Jauge : la trousse dessinée ; chaque produit coché dépose sa pastille dans un compartiment (toujours le même)
+  const JAUNE = '#ECD156', JAUNE_SOMBRE = '#8F7B22';   // jaune de validation (ronds des produits), fixe quelle que soit la couleur des zones
+  // centres des compartiments sur le dessin (en % de l'image, du fond vers l'avant)
+  const CASES = [[28, 46], [45.5, 41], [62.5, 39], [79.5, 44], [29.5, 54.5], [44.5, 50], [63, 49.5], [79, 52.5], [45.5, 60.5], [64, 58]];
+  const pastilleSac = j => {
+    const [x, y] = CASES[j % CASES.length], d = j >= CASES.length ? 4.5 : 0;     // au-delà de 10 : deuxième pastille dans la case
+    return { x: x + d, y: y - d * 0.6, c: ZONES[j % ZONES.length].couleur };
   };
-  // Après avoir coché : le sac grossit (rebond) et le chiffre monte ou descend
-  function animerJauge(avant) {
-    const sacEl = $stage.querySelector('.sac-sac'), num = sacEl && sacEl.querySelector('b');
+  const jaugeSac = n => {
+    const ok = lire(SACK, {});
+    const pts = SAC.map((x, j) => ok[x.id] ? (p => `<i data-p="${x.id}" style="left:${p.x}%;top:${p.y}%;background:${p.c}"></i>`)(pastilleSac(j)) : '').join('');
+    return `<div class="sac-jauge"><span class="sac-sac"><img src="img/voyage/trousse.png" alt="">${pts}</span>
+      <span class="sac-jt"><b data-n="${n}">${n} / ${SAC.length}</b> dans le sac<small>Touche un produit quand tu l'as</small></span></div>`;
+  };
+  // Après avoir coché : la pastille tombe dans son compartiment, la trousse rebondit, le chiffre monte ou descend
+  function animerJauge(avant, id) {
+    const sacEl = $stage.querySelector('.sac-sac'), num = $stage.querySelector('.sac-jt b');
     if (!sacEl) return;
     const apres = +num.dataset.n;
-    const t = +sacEl.style.getPropertyValue('--t') || 1;
-    sacEl.animate([{ transform: `scale(${t * 1.2})` }, { transform: `scale(${t})` }], { duration: 420, easing: 'cubic-bezier(.3,1.5,.5,1)' });
+    sacEl.animate([{ transform: 'scale(1.06)' }, { transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.3,1.5,.5,1)' });
+    const pt = id && sacEl.querySelector(`[data-p="${id}"]`);
+    if (pt) pt.animate([{ transform: 'translate(-50%,-260%) scale(.6)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.15)', opacity: 1, offset: 0.75 }, { transform: 'translate(-50%,-50%)' }], { duration: 520, easing: 'cubic-bezier(.3,.9,.4,1)' });
     const t0 = performance.now();
-    const tick = t => { const k = Math.min(1, (t - t0) / 350); num.textContent = Math.round(avant + (apres - avant) * k); if (k < 1) requestAnimationFrame(tick); };
+    const tick = t => { const k = Math.min(1, (t - t0) / 350); num.textContent = Math.round(avant + (apres - avant) * k) + ' / ' + SAC.length; if (k < 1) requestAnimationFrame(tick); };
     requestAnimationFrame(tick);
   }
   V.sac = () => {
@@ -1207,7 +1215,7 @@
       const t = window.OCEANIS.transition; window.OCEANIS.transition = p => p();   // sur place, sans fondu d'écran
       route(); window.OCEANIS.transition = t;
       const box = $stage.querySelector('.sac'); if (box) box.scrollTop = sc;
-      animerJauge(avant);
+      animerJauge(avant, id);
       const rond = ok[id] && $stage.querySelector(`[data-sac="${id}"] .sac-rond`);
       if (rond) rond.animate([{ transform: 'scale(0)' }, { transform: 'scale(1.08)', offset: 0.7 }, { transform: 'scale(1)' }], { duration: 380, easing: 'cubic-bezier(.3,1.4,.5,1)' });
       return;
