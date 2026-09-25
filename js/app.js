@@ -607,11 +607,15 @@
   // Jauge : la trousse dessinée se remplit dans l'ordre, du fond vers l'avant : une case de plus par produit coché
   // les 7 fonds de case retenus (face horizontale, contre le montant droit), relevés sur le dessin (repère de l'image 360 × 364)
   const CASES = ["153.4,132.9 156.4,131.8 166.6,129.1 175,127.4 193.5,128.5 190.3,144.9 189.3,144.9", "83.4,147.8 95.5,144.6 124.3,137.4 135,135.8 136.1,135.8 137.4,160.8 137.3,162.9 135.2,164.1 132,165.3 130.9,165.3 94.4,152", "208.4,150.9 212.4,149.8 226.5,145.5 246.4,142.2 247.4,142.3 247.3,166 244.2,165 214.4,154.2 209.4,152", "80.4,183.7 87.5,181.5 126.2,171 127.6,186.9 127.2,208.1 110.5,200.5 83.4,185.8", "140.4,168 141.4,166.9 152.4,163.7 174.3,157.4 192.3,154.1 194.4,154.1 194.1,189.1 191.1,189.2", "200.4,192.7 206.5,190.5 216.7,187 254.1,176.8 254.5,205.4 253.2,216 252.2,216 243,212.2 211.4,197.9", "135.4,212.9 138.4,211.8 179.9,198.6 187.1,196.8 188.1,196.9 188.1,234.1 184,234.3 167.8,229.6 155.6,223.8"];
+  const SAC_SOUPLE = '/p/sac-etanche-duffle-bag-sac-de-voyage-60l-jaune-noir/333985/c290c381m8773849';   // sac étanche souple 60 L
   const jaugeSac = n => {
     // 7 cases pour 9 produits : la trousse se remplit en proportion (tout coché = trousse pleine)
     const cases = CASES.slice(0, Math.round(n * CASES.length / SAC.length)).map((pts, i) => `<polygon data-i="${i}" points="${pts}" fill="${Z.P.couleur}"/>`).join('');
     return `<div class="sac-jauge"><span class="sac-jt"><b>Dans le sac</b><small>Touche un produit quand tu l'as</small></span>
-      <span class="sac-sac"><svg viewBox="0 0 360 364" aria-hidden="true">${cases}</svg><img src="img/voyage/trousse.png" alt=""></span></div>`;
+      <span class="sac-sac"><svg viewBox="0 0 360 364" aria-hidden="true">${cases}</svg><img src="img/voyage/trousse.png" alt=""></span>
+      <details class="sac-pas"><summary>Je n'ai pas de sac</summary>
+        <p>Un sac souple qui se plie sous la couchette : pas de valise à bord.</p>
+        <span class="sac-liens"><a href="${DECATHLON.site}${SAC_SOUPLE}" target="_blank" rel="noopener">Acheter</a><a href="${DECATHLON.location}" target="_blank" rel="noopener">Louer</a></span></details></div>`;
   };
   // Après avoir coché : la case se remplit et la trousse rebondit
   function animerJauge(avant, id) {

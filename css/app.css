@@ -642,3 +642,10 @@ img[data-detour]{transition:opacity .25s}
 .rpicto{position:absolute;left:120px;top:16px;width:44px;height:44px;z-index:4;overflow:hidden;border-radius:50%;display:flex;align-items:center;justify-content:center;--pf:var(--pc);pointer-events:none}
 .rpicto svg{width:44px;height:44px;display:block}
 .rpicto svg>path{stroke-width:3.2}
+/* « Je n'ai pas de sac » : sous la trousse, ouvre Acheter / Louer */
+.sac-pas{width:100%;max-width:260px;margin-top:6px;text-align:center}
+.sac-pas summary{list-style:none;display:inline-flex;align-items:center;height:32px;padding:0 16px;border-radius:16px;border:1.5px solid var(--ink);font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer}
+.sac-pas summary::-webkit-details-marker{display:none}
+.sac-pas[open] summary{background:var(--ink);color:#fff}
+.sac-pas p{margin:10px 0 2px;font-size:11.5px;line-height:1.4;color:var(--muted)}
+.sac-pas .sac-liens{margin-top:8px}
