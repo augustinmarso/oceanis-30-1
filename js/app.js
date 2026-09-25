@@ -604,44 +604,35 @@
     im.onerror = () => poser(u, null);
     im.src = u;
   }
-  // Jauge : la trousse dessinée ; chaque produit coché dépose sa pastille dans un compartiment (toujours le même)
-  const JAUNE = '#ECD156', JAUNE_SOMBRE = '#8F7B22';   // jaune de validation (ronds des produits), fixe quelle que soit la couleur des zones
-  // centres des compartiments sur le dessin (en % de l'image, du fond vers l'avant)
-  // (relevés sur le dessin : centre du fond de chaque case, une case par produit)
-  const CASES = [[32.9, 41.2], [43.9, 40.8], [25.3, 45.5], [48.8, 46.8], [60.6, 47.1], [81.3, 48.1], [30.9, 51.6], [41.9, 52.3], [65.5, 53.7], [78, 54.1], [47.3, 59.2], [59.7, 60.2]];
-  const pastilleSac = j => { const [x, y] = CASES[j % CASES.length]; return { x, y: y + 1.2, c: Z.P.couleur }; };   // couleur de la zone Sécurité
+  // Jauge : la trousse dessinée ; chaque produit coché remplit sa case (toujours la même) de couleur
+  // contours des 12 cases, relevés sur le dessin (repère de l'image 360 × 364)
+  const CASES = ["83.4,147.8 95.5,144.6 124.3,137.4 135,135.8 136.1,135.8 137.4,160.8 137.3,162.9 135.2,164.1 132,165.3 130.9,165.3 94.4,152", "142.9,134.9 143.9,134.8 147.2,135.6 187.6,150.3 144.4,161.5 142.4,144", "208.4,150.9 212.4,149.8 226.5,145.5 246.4,142.2 247.4,142.3 247.3,166 244.2,165 214.4,154.2 209.4,152", "74.8,150 110.5,162.4 118.6,165.8 120.6,166.9 119.6,168 95.9,175.6 79.7,178.9 75.6,179.8 74.4,165.8", "140.4,168 141.4,166.9 152.4,163.7 174.3,157.4 192.3,154.1 194.4,154.1 194.1,189.1 191.1,189.2", "201.9,154.9 202.9,154.8 214.6,158.5 240.6,168.9 250.6,173.1 224.9,181.3 205,186.2 201.9,186.1", "80.4,183.7 87.5,181.5 126.2,171 127.6,186.9 127.2,208.1 110.5,200.5 83.4,185.8", "131.6,171.2 132.6,171.2 140.7,174.1 154.1,178.7 160.1,180.4 173.6,187 180.6,190.3 184.6,192.3 182.5,193.4 179.5,194.6 165.7,199.4 133.8,208", "200.4,192.7 206.5,190.5 216.7,187 254.1,176.8 254.5,205.4 253.2,216 252.2,216 243,212.2 211.4,197.9", "262.7,178.1 263.7,178 266.8,179 308.6,195 313.6,197.1 315.6,198.2 314.6,199.2 263.8,215.1 262.8,215.1", "135.4,212.9 138.4,211.8 179.9,198.6 187.1,196.8 188.1,196.9 188.1,234.1 184,234.3 167.8,229.6 155.6,223.8", "194.8,196.9 196.9,196.9 241.5,216.5 249.6,220.9 248.6,222 244.6,224.1 226.7,232.4 223.2,233.6 213.1,235.3 205.8,236 195.6,235.7"];
   const jaugeSac = n => {
-    const ok = lire(SACK, {});
-    const pts = SAC.map((x, j) => ok[x.id] ? (p => `<i data-p="${x.id}" style="left:${p.x}%;top:${p.y}%;background:${p.c}"></i>`)(pastilleSac(j)) : '').join('');
-    return `<div class="sac-jauge"><span class="sac-sac"><img src="img/voyage/trousse.png" alt="">${pts}<b class="sac-n" data-n="${n}">${n}<small>/${SAC.length}</small></b></span>
+    const ok = lire(SACK, {}), c = Z.P.couleur;
+    const cases = SAC.map((x, j) => ok[x.id] && CASES[j] ? `<polygon data-p="${x.id}" points="${CASES[j]}" fill="${c}"/>` : '').join('');
+    return `<div class="sac-jauge"><span class="sac-sac"><svg viewBox="0 0 360 364" aria-hidden="true">${cases}</svg><img src="img/voyage/trousse.png" alt=""></span>
       <span class="sac-jt"><b>Dans le sac</b><small>Touche un produit quand tu l'as</small></span></div>`;
   };
-  // Après avoir coché : la pastille tombe dans son compartiment, la trousse rebondit, le chiffre monte ou descend
+  // Après avoir coché : la case se remplit et la trousse rebondit
   function animerJauge(avant, id) {
-    const sacEl = $stage.querySelector('.sac-sac'), num = $stage.querySelector('.sac-n');
+    const sacEl = $stage.querySelector('.sac-sac');
     if (!sacEl) return;
-    const apres = +num.dataset.n;
     sacEl.animate([{ transform: 'scale(1.06)' }, { transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.3,1.5,.5,1)' });
     const pt = id && sacEl.querySelector(`[data-p="${id}"]`);
-    if (pt) pt.animate([{ transform: 'translate(-50%,-260%) scale(.6)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.15)', opacity: 1, offset: 0.75 }, { transform: 'translate(-50%,-50%)' }], { duration: 520, easing: 'cubic-bezier(.3,.9,.4,1)' });
-    const t0 = performance.now();
-    const tick = t => { const k = Math.min(1, (t - t0) / 350); num.firstChild.textContent = Math.round(avant + (apres - avant) * k); if (k < 1) requestAnimationFrame(tick); };
-    requestAnimationFrame(tick);
+    if (pt) pt.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 420, easing: 'ease-out' });
   }
   V.sac = () => {
     const ok = lire(SACK, {}), n = SAC.filter(x => ok[x.id]).length;
-    const vie = VIE_A_BORD.map(v => `<li>${v.src ? `<img src="${v.src}" alt="">` : imgD(imgDeca(v.img, 160))}<span><b>${esc(v.titre)}</b>${esc(v.texte)}</span></li>`).join('');
     const objets = SAC.map(x => `<div class="sac-o${ok[x.id] ? ' ok' : ''}">
         <button class="sac-img" ${x.page ? `data-go="#/produit/${x.id}"` : `data-sac="${x.id}"`} aria-pressed="${!!ok[x.id]}" aria-label="${esc(x.nom)} : ${ok[x.id] ? 'je l’ai' : 'je ne l’ai pas'}"><span class="sac-rond"></span>${imgD(imgDeca(x.id))}</button>
         <b>${esc(x.nom)}</b><small>${esc(x.note)}</small>
         ${ok[x.id] ? `<span class="sac-a">${I.check(INK, 12, 3)} Dans le sac</span>` : `<span class="sac-liens"><a href="${x.page ? `#/produit/${x.id}` : DECATHLON.site + x.lien}"${x.page ? '' : ' target="_blank" rel="noopener"'}>${x.page ? 'Voir' : 'Acheter'}</a>${x.louer ? `<a href="${DECATHLON.location}" target="_blank" rel="noopener">Louer</a>` : ''}</span>`}
       </div>`).join('');
-    return screen(null, `background:var(--neutral);--rond:${Z.P.couleur}`, `
+    return screen(null, `background:var(--neutral);--rond:${mix(Z.P.couleur, "#FFFFFF", 0.35)}`, `
       <div class="head"><a class="icon-btn" href="#/" aria-label="Retour">${I.back()}</a><h1>S’organiser sur le bateau</h1></div>
       ${ongletsAvant('sac')}
       <div class="sac">
         ${jaugeSac(n)}
-        <section><h2>Vie à bord</h2><ul class="sac-vie">${vie}</ul></section>
         <section><h2>À emporter</h2><div class="sac-grille">${objets}</div></section>
         <p class="sac-source">Équipements et images : Decathlon. Ce qui te manque s'achète en ligne, ou se loue pour le week-end.</p>
       </div>`);
