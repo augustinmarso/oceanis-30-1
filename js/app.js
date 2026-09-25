@@ -636,7 +636,7 @@
         <b>${esc(x.nom)}</b><small>${esc(x.note)}</small>
         ${ok[x.id] ? `<span class="sac-a">${I.check(INK, 12, 3)} Dans le sac</span>` : `<span class="sac-liens"><a href="${x.page ? `#/produit/${x.id}` : DECATHLON.site + x.lien}"${x.page ? '' : ' target="_blank" rel="noopener"'}>${x.page ? 'Voir' : 'Acheter'}</a>${x.louer ? `<a href="${DECATHLON.location}" target="_blank" rel="noopener">Louer</a>` : ''}</span>`}
       </div>`).join('');
-    return screen(null, `background:var(--neutral);--rond:${JAUNE}`, `
+    return screen(null, `background:var(--neutral);--rond:${Z.P.couleur}`, `
       <div class="head"><a class="icon-btn" href="#/" aria-label="Retour">${I.back()}</a><h1>S’organiser sur le bateau</h1></div>
       ${ongletsAvant('sac')}
       <div class="sac">
