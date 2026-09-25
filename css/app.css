@@ -632,5 +632,6 @@ img[data-detour]{transition:opacity .25s}
 .sac-sac{width:70px;height:84px}
 .sac-sac>b{margin-top:44px;font-size:20px}
 /* Pastille du picto de la zone, à côté de Retour et Accueil */
-.rpicto{position:absolute;left:120px;top:16px;width:44px;height:44px;border-radius:22px;background:#fff;z-index:4;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#10233A;--pf:#fff;pointer-events:none}
-.rpicto svg{width:40px;height:40px;display:block}
+.rpicto{position:absolute;left:120px;top:16px;width:44px;height:44px;z-index:4;overflow:hidden;border-radius:50%;display:flex;align-items:center;justify-content:center;--pf:var(--pc);pointer-events:none}
+.rpicto svg{width:44px;height:44px;display:block}
+.rpicto svg>path{stroke-width:3.2}

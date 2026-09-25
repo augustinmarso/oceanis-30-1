@@ -212,11 +212,11 @@
   /* Bouton principal sur panneau de zone : blanc sur zone sombre, marine sur zone claire */
   const zoneCta = (z, label, href, pos = 'b84') => z.sombre ? cta(label, href, `light ${pos}`, z.texte) : cta(label, href, `dark ${pos}`);
   // --pc = couleur du panneau : l'onglet de titre, fixé en haut quand la fiche défile, en reprend le fond
-  // Pastille du picto de la zone, à côté de Retour et Accueil (picto sans son cercle de contour)
+  // Picto de la zone (avec son cercle), à côté de Retour et Accueil, sur l'écran de la catégorie
   const pastille = id => Z[id] && typeof PICTOS !== 'undefined' && PICTOS[id]
-    ? `<span class="rpicto" data-zone="${id}" role="img" aria-label="${esc(Z[id].nom)}">${PICTOS[id].replace(/<\/g>[\s\S]*<\/svg>$/, '</g></svg>')}</span>` : '';
+    ? `<span class="rpicto" data-zone="${id}" role="img" aria-label="${esc(Z[id].nom)}" style="color:${Z[id].sombre ? '#FFFFFF' : INK}">${PICTOS[id]}</span>` : '';
   const screen = (active, panelStyle, inner, extra = '') =>
-    `${dots(active)}${extra}<main class="panel" style="${panelStyle};--pc:${(panelStyle.match(/background:([^;]+)/) || [, 'transparent'])[1]}">${inner.includes('class="rbtn"') ? pastille(active) : ''}${inner}</main>`;
+    `${dots(active)}${extra}<main class="panel" style="${panelStyle};--pc:${(panelStyle.match(/background:([^;]+)/) || [, 'transparent'])[1]}">${inner}</main>`;
 
   function ficheBody(p, color, extra = '') {
     let h = `<p>${esc(p.def)}</p><p class="sub">À quoi ça sert ?</p><p>${esc(p.sert)}</p>`;
@@ -291,7 +291,7 @@
       return `<li${S.faits[a] ? ' class="fait"' : ''}><a href="${startHref(a)}">${esc(A.liste || A.titre)}</a>${S.faits[a] ? ` <span class="coche" style="background:${z.texte}">${I.check('#FFFFFF', 10, 3.5)}</span>` : ''}</li>`;
     }).join('');
     return screen(id, `background:${z.couleur}`, `
-      ${backBtn('#/')}
+      ${backBtn('#/')}${pastille(id)}
       ${boatAt('left:118px;bottom:152px', 0.42, { mode: 'zone', zone: id, cible: 'z:' + id })}
       <div class="col" style="--reserve:150px">${tabTitle(z.court, z.texte)}
         <div class="card" style="color:${z.texte}"><p>${esc(z.intro)}</p><p style="margin:10px 0 6px">Les pièces</p><div class="chips">${chips}</div><p style="margin:12px 0 2px">Ce que tu vas faire · ${z.actions.filter(a => S.faits[a]).length}/${z.actions.length} validés</p><ol>${acts}</ol></div></div>
@@ -1070,7 +1070,8 @@
   let dernierPicto = null;
   function animerPicto() {
     const el = $stage.querySelector('.rpicto'), id = el ? el.dataset.zone : null;
-    if (el && id !== dernierPicto && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (!el) return;                                   // écran sans picto : on garde la dernière catégorie vue
+    if (id !== dernierPicto && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
       el.animate([{ transform: 'scale(.4)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 380, easing: 'cubic-bezier(.3,1.3,.5,1)' });
       el.firstElementChild.animate([{ transform: 'translateX(-130%)' }, { transform: 'translateX(-130%)', offset: 0.25 }, { transform: 'none' }], { duration: 750, easing: 'cubic-bezier(.2,.8,.2,1)' });
     }
