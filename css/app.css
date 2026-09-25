@@ -636,7 +636,7 @@ img[data-detour]{transition:opacity .25s}
 /* compteur sur le rabat ouvert, le long de la fermeture */
 .sac-sac>b.sac-n{position:absolute;margin:0;left:39%;top:15%;transform:translate(-50%,-50%) rotate(-3deg);font-size:40px;font-weight:700;color:var(--ink);line-height:1;white-space:nowrap}
 .sac-n small{font-size:18px;font-weight:600;color:var(--muted)}
-.sac-jt{align-items:center}
+.sac-jt{align-items:center;margin-bottom:22px}
 .sac-vie img[src$="trousse.png"]{object-fit:contain}
 /* Pastille du picto de la zone, à côté de Retour et Accueil */
 .rpicto{position:absolute;left:120px;top:16px;width:44px;height:44px;z-index:4;overflow:hidden;border-radius:50%;display:flex;align-items:center;justify-content:center;--pf:var(--pc);pointer-events:none}
