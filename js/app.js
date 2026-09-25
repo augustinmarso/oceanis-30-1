@@ -604,17 +604,12 @@
     im.onerror = () => poser(u, null);
     im.src = u;
   }
-  // Jauge : un sac qui grossit à mesure qu'on coche, du jaune sombre au jaune clair (celui des validations)
+  // Jauge : la trousse (dessin) grossit à mesure qu'on coche ; le compteur passe du jaune sombre au jaune clair (celui des validations)
   const JAUNE = '#ECD156', JAUNE_SOMBRE = '#8F7B22';   // jaune de validation (ronds et sac), fixe quelle que soit la couleur des zones
   const jaugeSac = n => {
     const p = n / SAC.length, c = mix(JAUNE_SOMBRE, JAUNE, p);
-    return `<div class="sac-jauge"><span class="sac-sac" style="--t:${(0.55 + 0.45 * p).toFixed(3)}"><svg viewBox="0 0 64 76" aria-hidden="true">
-        <path d="M25 13v-3a7 7 0 0 1 14 0v3" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round"/>
-        <path d="M10 26C3 34 3 56 10 66M54 26c7 8 7 30 0 40" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round" opacity=".7"/>
-        <rect x="8" y="12" width="48" height="60" rx="16" fill="${c}"/>
-        <path d="M8 30c8 7 40 7 48 0" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2.4" stroke-linecap="round"/>
-        <rect x="17" y="42" width="30" height="24" rx="8" fill="#FFFFFF" fill-opacity=".38"/></svg>
-        <b data-n="${n}">${n}</b></span><span class="sac-jt"><b>${n} / ${SAC.length}</b> dans le sac<small>Touche un produit quand tu l'as</small></span></div>`;
+    return `<div class="sac-jauge"><span class="sac-sac" style="--t:${(0.55 + 0.45 * p).toFixed(3)}"><img src="img/voyage/trousse.png" alt="">
+        <b data-n="${n}" style="background:${c}">${n}</b></span><span class="sac-jt"><b>${n} / ${SAC.length}</b> dans le sac<small>Touche un produit quand tu l'as</small></span></div>`;
   };
   // Après avoir coché : le sac grossit (rebond) et le chiffre monte ou descend
   function animerJauge(avant) {
@@ -629,7 +624,7 @@
   }
   V.sac = () => {
     const ok = lire(SACK, {}), n = SAC.filter(x => ok[x.id]).length;
-    const vie = VIE_A_BORD.map(v => `<li>${imgD(imgDeca(v.img, 160))}<span><b>${esc(v.titre)}</b>${esc(v.texte)}</span></li>`).join('');
+    const vie = VIE_A_BORD.map(v => `<li>${v.src ? `<img src="${v.src}" alt="">` : imgD(imgDeca(v.img, 160))}<span><b>${esc(v.titre)}</b>${esc(v.texte)}</span></li>`).join('');
     const objets = SAC.map(x => `<div class="sac-o${ok[x.id] ? ' ok' : ''}">
         <button class="sac-img" ${x.page ? `data-go="#/produit/${x.id}"` : `data-sac="${x.id}"`} aria-pressed="${!!ok[x.id]}" aria-label="${esc(x.nom)} : ${ok[x.id] ? 'je l’ai' : 'je ne l’ai pas'}"><span class="sac-rond"></span>${imgD(imgDeca(x.id))}</button>
         <b>${esc(x.nom)}</b><small>${esc(x.note)}</small>
