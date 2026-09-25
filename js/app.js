@@ -604,12 +604,11 @@
     im.onerror = () => poser(u, null);
     im.src = u;
   }
-  // Jauge : la trousse dessinée ; chaque produit coché remplit sa case (toujours la même) de couleur
+  // Jauge : la trousse dessinée se remplit dans l'ordre, du fond vers l'avant : une case de plus par produit coché
   // contours des 9 cases, relevés sur le dessin (repère de l'image 360 × 364)
   const CASES = ["83.4,147.8 95.5,144.6 124.3,137.4 135,135.8 136.1,135.8 137.4,160.8 137.3,162.9 135.2,164.1 132,165.3 130.9,165.3 94.4,152", "140.4,168 141.4,166.9 152.4,163.7 174.3,157.4 192.3,154.1 194.4,154.1 194.1,189.1 191.1,189.2", "201.9,154.9 202.9,154.8 214.6,158.5 240.6,168.9 250.6,173.1 224.9,181.3 205,186.2 201.9,186.1", "80.4,183.7 87.5,181.5 126.2,171 127.6,186.9 127.2,208.1 110.5,200.5 83.4,185.8", "131.6,171.2 132.6,171.2 140.7,174.1 154.1,178.7 160.1,180.4 173.6,187 180.6,190.3 184.6,192.3 182.5,193.4 179.5,194.6 165.7,199.4 133.8,208", "200.4,192.7 206.5,190.5 216.7,187 254.1,176.8 254.5,205.4 253.2,216 252.2,216 243,212.2 211.4,197.9", "262.7,178.1 263.7,178 266.8,179 308.6,195 313.6,197.1 315.6,198.2 314.6,199.2 263.8,215.1 262.8,215.1", "135.4,212.9 138.4,211.8 179.9,198.6 187.1,196.8 188.1,196.9 188.1,234.1 184,234.3 167.8,229.6 155.6,223.8", "194.8,196.9 196.9,196.9 241.5,216.5 249.6,220.9 248.6,222 244.6,224.1 226.7,232.4 223.2,233.6 213.1,235.3 205.8,236 195.6,235.7"];
   const jaugeSac = n => {
-    const ok = lire(SACK, {}), c = Z.P.couleur;
-    const cases = SAC.map((x, j) => ok[x.id] && CASES[j] ? `<polygon data-p="${x.id}" points="${CASES[j]}" fill="${c}"/>` : '').join('');
+    const cases = CASES.slice(0, n).map((pts, i) => `<polygon data-i="${i}" points="${pts}" fill="${Z.P.couleur}"/>`).join('');
     return `<div class="sac-jauge"><span class="sac-sac"><svg viewBox="0 0 360 364" aria-hidden="true">${cases}</svg><img src="img/voyage/trousse.png" alt=""></span>
       <span class="sac-jt"><b>Dans le sac</b><small>Touche un produit quand tu l'as</small></span></div>`;
   };
@@ -618,7 +617,8 @@
     const sacEl = $stage.querySelector('.sac-sac');
     if (!sacEl) return;
     sacEl.animate([{ transform: 'scale(1.06)' }, { transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.3,1.5,.5,1)' });
-    const pt = id && sacEl.querySelector(`[data-p="${id}"]`);
+    const n = SAC.filter(x => lire(SACK, {})[x.id]).length;
+    const pt = n > avant && sacEl.querySelector(`[data-i="${n - 1}"]`);   // la case qui vient de se remplir
     if (pt) pt.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 420, easing: 'ease-out' });
   }
   V.sac = () => {
