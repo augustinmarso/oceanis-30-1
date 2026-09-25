@@ -184,7 +184,11 @@
     }
     const pcts = m === 'progres' ? JSON.stringify(Object.fromEntries(ZONES.map(z => [z.id, +pct(z).toFixed(2)]))) : '';
     const pulseC = opts.pulse && PIECES[opts.pulse] ? Z[PIECES[opts.pulse].zone].couleur : '';
-    return `<div class="slot3d" data-mode="${m}"${opts.cible ? ` data-cible="${opts.cible}"` : ''}${opts.zone ? ` data-zone="${opts.zone}"` : ''}${pulseC ? ` data-pulse="${pulseC}"` : ''}${pcts ? ` data-pcts='${pcts}'` : ''} style="${style}"></div>`;
+    // Écrans d'une zone : le picto de la zone, en grand et en transparence, derrière le bateau 3D
+    const z = m === 'zone' && opts.zone && Z[opts.zone];
+    const picto = z && typeof PICTOS !== 'undefined' && PICTOS[z.id]
+      ? `<div class="picto-zone" data-zone="${z.id}" style="${style};color:${z.sombre ? '#FFFFFF' : z.texte}">${PICTOS[z.id]}</div>` : '';
+    return picto + `<div class="slot3d" data-mode="${m}"${opts.cible ? ` data-cible="${opts.cible}"` : ''}${opts.zone ? ` data-zone="${opts.zone}"` : ''}${pulseC ? ` data-pulse="${pulseC}"` : ''}${pcts ? ` data-pcts='${pcts}'` : ''} style="${style}"></div>`;
   }
 
   /* ───────────── Illustrations des leçons (zone Conduite) ───────────── */
@@ -1052,6 +1056,7 @@
       watchInline();
       scrollHints();
       if (name === 'parcours') animerDossiers(avant);
+      animerPicto();
       $stage.querySelectorAll('img[data-detour]:not(.detoure)').forEach(i => detourer(i.dataset.detour));
       if (name === 'invitation') jouerCarte();
       if (deblocage && name === '') jouerDeblocage(deblocage);
@@ -1061,6 +1066,14 @@
     // sauf entre deux états du Parcours : là, ce sont les dossiers eux-mêmes qui bougent
     if (!memeEcran && window.OCEANIS && window.OCEANIS.transition) window.OCEANIS.transition(paint, { retour, name }); else paint();
     document.title = 'Oceanis 30.1 — Microlearning';
+  }
+  // Le picto entre en tournant quand on arrive dans une autre catégorie ; il reste immobile entre les écrans d'une même zone
+  let dernierPicto = null;
+  function animerPicto() {
+    const el = $stage.querySelector('.picto-zone'), id = el ? el.dataset.zone : null;
+    if (el && id !== dernierPicto && !matchMedia('(prefers-reduced-motion: reduce)').matches)
+      el.animate([{ opacity: 0, transform: 'scale(.55) rotate(-24deg)' }, { opacity: 0.22, transform: 'none' }], { duration: 900, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    dernierPicto = id;
   }
   function go(h, replace) {
     if (replace) { hist.pop(); history.replaceState(null, '', h); route(); }
