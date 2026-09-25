@@ -621,23 +621,14 @@
     const pt = n > avant && sacEl.querySelector(`[data-i="${n - 1}"]`);   // la case qui vient de se remplir
     if (pt) pt.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 420, easing: 'ease-out' });
   }
-  // En quittant Mon sac : une main arrive par la droite, saisit la poignée de la trousse et l'emporte hors de l'écran
-  const MAIN = `<svg class="sac-main" viewBox="0 0 400 80" aria-hidden="true" fill="${INK}">
-      <path d="M86 26 C110 18 140 16 170 16 L400 12 L400 44 L170 46 C150 48 128 50 104 52 Z"/>
-      <path d="M22 34 C22 22 34 16 50 16 L84 16 C98 16 106 26 104 40 L102 50 C100 56 94 58 88 58 L30 58 C24 58 20 52 20 46 Z"/>
-      <g class="sac-doigts"><rect x="22" y="50" width="17" height="22" rx="8.5"/><rect x="41" y="52" width="17" height="22" rx="8.5"/><rect x="60" y="52" width="17" height="21" rx="8.5"/><rect x="79" y="50" width="16" height="19" rx="8"/></g>
-      <path d="M84 40 C94 36 110 38 112 48 C108 56 96 58 86 56 Z"/></svg>`;
+  // En quittant Mon sac : la trousse recule d'un petit coup puis glisse hors de l'écran, vers la droite
   let sacParti = false;
   function emporterSac(suite) {
     const sac = $stage.querySelector('.sac-sac');
     if (!sac || sacParti || matchMedia('(prefers-reduced-motion: reduce)').matches) return suite();
     sacParti = true;
-    sac.insertAdjacentHTML('beforeend', MAIN);
-    const main = sac.querySelector('.sac-main'), doigts = main.querySelector('.sac-doigts');
-    main.animate([{ transform: 'translateX(320px)' }, { transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'both' });
-    doigts.animate([{ transform: 'scaleY(.45)' }, { transform: 'none' }], { duration: 160, delay: 420, easing: 'ease-out', fill: 'both' });
     sac.animate([{ transform: 'none' }, { transform: 'translateX(-6px) rotate(-2deg)', offset: 0.2 }, { transform: 'translateX(520px) rotate(5deg)' }],
-      { duration: 620, delay: 600, easing: 'cubic-bezier(.5,0,.8,.4)', fill: 'forwards' })
+      { duration: 620, easing: 'cubic-bezier(.5,0,.8,.4)', fill: 'forwards' })
       .finished.then(() => { sacParti = false; suite(); });
   }
   $stage.addEventListener('click', e => {

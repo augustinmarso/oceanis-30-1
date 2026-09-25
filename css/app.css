@@ -642,6 +642,3 @@ img[data-detour]{transition:opacity .25s}
 .rpicto{position:absolute;left:120px;top:16px;width:44px;height:44px;z-index:4;overflow:hidden;border-radius:50%;display:flex;align-items:center;justify-content:center;--pf:var(--pc);pointer-events:none}
 .rpicto svg{width:44px;height:44px;display:block}
 .rpicto svg>path{stroke-width:3.2}
-/* Main qui emporte la trousse en quittant Mon sac (prise sur la poignée, côté droit) */
-.sac-sac>svg.sac-main{position:absolute;inset:auto;left:calc(82% - 51px);top:calc(74% - 53px);width:340px;height:68px;z-index:2;pointer-events:none}
-.sac-doigts{transform-origin:60px 50px}
