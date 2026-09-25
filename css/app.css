@@ -631,6 +631,6 @@ img[data-detour]{transition:opacity .25s}
 /* Jauge : sac à dos (plus parlant), chiffre dans la poche avant */
 .sac-sac{width:70px;height:84px}
 .sac-sac>b{margin-top:44px;font-size:20px}
-/* Picto de la zone derrière le bateau 3D (écrans d'une zone) */
-.picto-zone{position:absolute;z-index:0;display:flex;align-items:center;justify-content:flex-end;padding-right:22px;box-sizing:border-box;transform-origin:calc(100% - 100px) 50%;pointer-events:none;opacity:.22;--pf:var(--pc)}
-.picto-zone svg{height:62%;width:auto;max-width:62%}
+/* Pastille du picto de la zone, à côté de Retour et Accueil */
+.rpicto{position:absolute;left:120px;top:16px;width:44px;height:44px;border-radius:22px;background:#fff;z-index:4;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#10233A;--pf:#fff;pointer-events:none}
+.rpicto svg{width:40px;height:40px;display:block}

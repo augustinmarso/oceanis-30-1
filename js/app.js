@@ -184,11 +184,7 @@
     }
     const pcts = m === 'progres' ? JSON.stringify(Object.fromEntries(ZONES.map(z => [z.id, +pct(z).toFixed(2)]))) : '';
     const pulseC = opts.pulse && PIECES[opts.pulse] ? Z[PIECES[opts.pulse].zone].couleur : '';
-    // Écrans d'une zone : le picto de la zone, en grand et en transparence, derrière le bateau 3D
-    const z = m === 'zone' && opts.zone && Z[opts.zone];
-    const picto = z && typeof PICTOS !== 'undefined' && PICTOS[z.id]
-      ? `<div class="picto-zone" data-zone="${z.id}" style="${style};color:${z.sombre ? '#FFFFFF' : z.texte}">${PICTOS[z.id]}</div>` : '';
-    return picto + `<div class="slot3d" data-mode="${m}"${opts.cible ? ` data-cible="${opts.cible}"` : ''}${opts.zone ? ` data-zone="${opts.zone}"` : ''}${pulseC ? ` data-pulse="${pulseC}"` : ''}${pcts ? ` data-pcts='${pcts}'` : ''} style="${style}"></div>`;
+    return `<div class="slot3d" data-mode="${m}"${opts.cible ? ` data-cible="${opts.cible}"` : ''}${opts.zone ? ` data-zone="${opts.zone}"` : ''}${pulseC ? ` data-pulse="${pulseC}"` : ''}${pcts ? ` data-pcts='${pcts}'` : ''} style="${style}"></div>`;
   }
 
   /* ───────────── Illustrations des leçons (zone Conduite) ───────────── */
@@ -216,8 +212,11 @@
   /* Bouton principal sur panneau de zone : blanc sur zone sombre, marine sur zone claire */
   const zoneCta = (z, label, href, pos = 'b84') => z.sombre ? cta(label, href, `light ${pos}`, z.texte) : cta(label, href, `dark ${pos}`);
   // --pc = couleur du panneau : l'onglet de titre, fixé en haut quand la fiche défile, en reprend le fond
+  // Pastille du picto de la zone, à côté de Retour et Accueil (picto sans son cercle de contour)
+  const pastille = id => Z[id] && typeof PICTOS !== 'undefined' && PICTOS[id]
+    ? `<span class="rpicto" data-zone="${id}" role="img" aria-label="${esc(Z[id].nom)}">${PICTOS[id].replace(/<\/g>[\s\S]*<\/svg>$/, '</g></svg>')}</span>` : '';
   const screen = (active, panelStyle, inner, extra = '') =>
-    `${dots(active)}${extra}<main class="panel" style="${panelStyle};--pc:${(panelStyle.match(/background:([^;]+)/) || [, 'transparent'])[1]}">${inner}</main>`;
+    `${dots(active)}${extra}<main class="panel" style="${panelStyle};--pc:${(panelStyle.match(/background:([^;]+)/) || [, 'transparent'])[1]}">${inner.includes('class="rbtn"') ? pastille(active) : ''}${inner}</main>`;
 
   function ficheBody(p, color, extra = '') {
     let h = `<p>${esc(p.def)}</p><p class="sub">À quoi ça sert ?</p><p>${esc(p.sert)}</p>`;
@@ -1067,12 +1066,14 @@
     if (!memeEcran && window.OCEANIS && window.OCEANIS.transition) window.OCEANIS.transition(paint, { retour, name }); else paint();
     document.title = 'Oceanis 30.1 — Microlearning';
   }
-  // Le picto entre en tournant quand on arrive dans une autre catégorie ; il reste immobile entre les écrans d'une même zone
+  // Le picto glisse dans sa pastille quand on arrive dans une autre catégorie ; il ne bouge pas entre les écrans d'une même zone
   let dernierPicto = null;
   function animerPicto() {
-    const el = $stage.querySelector('.picto-zone'), id = el ? el.dataset.zone : null;
-    if (el && id !== dernierPicto && !matchMedia('(prefers-reduced-motion: reduce)').matches)
-      el.animate([{ opacity: 0, transform: 'scale(.55) rotate(-24deg)' }, { opacity: 0.22, transform: 'none' }], { duration: 900, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    const el = $stage.querySelector('.rpicto'), id = el ? el.dataset.zone : null;
+    if (el && id !== dernierPicto && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.animate([{ transform: 'scale(.4)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 380, easing: 'cubic-bezier(.3,1.3,.5,1)' });
+      el.firstElementChild.animate([{ transform: 'translateX(-130%)' }, { transform: 'translateX(-130%)', offset: 0.25 }, { transform: 'none' }], { duration: 750, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    }
     dernierPicto = id;
   }
   function go(h, replace) {
